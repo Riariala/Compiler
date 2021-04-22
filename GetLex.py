@@ -3,12 +3,14 @@ import StatesTable
 
 class Lexems(object):
     def __init__(self):
-        #self.keyWords = ['and', 'array', 'begin', 'case', 'const', 'div', 'do', 'downto', 'else', 'end', 'file', 'for', 'function', 'goto', 'if', 'in', 'label', 'mod', 'nil', 'not', 'of', 'or', 'packed', 'procedure', 'program', 'record', 'repeat', 'set', 'then', 'to', 'type', 'until', 'var', 'while', 'with']
-        #self.Delimiter = ['.', ';', ',', '(', ')', '+', '-', '*', '/', '=', '>', '<', '[', ']', ':', '{','}','$']
+        self.keyWords = ['and', 'array', 'begin', 'case', 'const', 'div', 'do', 'downto', 'else', 'end', 'file', 'for', 'function', 'goto', 'if', 'in', 'label', 'mod', 'nil', 'not', 'of', 'or', 'packed', 'procedure', 'program', 'record', 'repeat', 'set', 'then', 'to', 'type', 'until', 'var', 'while', 'with']
+        self.Delimiter = ['.', ';', ',', '(', ')',  '[', ']', ':', '{','}','$']
         #self.dobleDelimetr = ['<>',':=','>=','<=','+=','-=','/=','*=','(*','*)', '..']
+        self.operators = ['+', '-', '*', '/', '=', '>', '<','<>',':=','>=','<=','+=','-=','/=','*=']
         self.separ = [' ','\n', '\t', '\0', '\r']
         self.state = "S" 
         self.fr = FileReader.FileReader('input.txt')
+        self.fw = open('output.txt', 'w')
         self.currChar = ' '
         self.buf = ''
         self.lexStartsFrom = 0
@@ -16,13 +18,13 @@ class Lexems(object):
         self.EOF = False
 
     def getLex(self):
-        #self.buf = ''
         if self.EOF:
             return "EOF"
         self.lexStartsFrom = self.fr.GetPos()
         prevState = self.state
         toReturm = ''
         while self.state != "F" and not self.EOF:
+            self.currChar = self.fr.NextChar()
             if self.state == "S":
                 self.buf = ''
             if self.state == "D":
@@ -38,6 +40,7 @@ class Lexems(object):
                 else:
                     print("Ошибка с комментариями")
                     break
+                self.buf += self.currChar
                 self.currChar = self.fr.NextChar()
                 self.buf += self.currChar
                 while (not self.currChar in stopList) and self.currChar != "":
@@ -45,14 +48,11 @@ class Lexems(object):
                     if self.currChar not in ['\n', '\t', '\0', '\r']:
                         self.buf += self.currChar
                 if  self.currChar == "":
-                    self.state = "ERR"
                     self.EOF = True
-                else:
-                    toReturm = "Comment"
+                toReturm = "Comment"
                 break
             if self.state == "STR":
-                stopList = self.currChar
-                self.currChar = self.fr.NextChar()
+                stopList = self.buf
                 self.buf += self.currChar
                 while self.currChar != stopList and self.currChar != "":
                     self.currChar = self.fr.NextChar()
@@ -63,10 +63,16 @@ class Lexems(object):
                     toReturm = "String"
                 break
             if self.state == "NF":
-                pass
+                if self.currChar =='+' or self.currChar == '-':
+                    if self.buf[-1] !='E' and self.buf[-1] !='e':
+                        self.state = "F"
+                if self.currChar =='E' or self.currChar =='e':
+                    if self.buf.find(self.currChar) != -1 or self.buf[-1] =='.':
+                        self.state = "ERR"
             if self.state == "ERR":
-                pass
-            self.currChar = self.fr.NextChar()
+                self.fw.write("Ошибка в лексеме на символе  " + str(self.lexStartsFrom) +'\r')
+                #print("Ошибка в лексеме на символе  ", self.lexStartsFrom)
+                return "EOF" 
             prevState = self.state
             if self.currChar != "":
                 self.state = self.stateTable.getNewState(self.state,self.currChar)
@@ -75,16 +81,25 @@ class Lexems(object):
                 break
             if self.state != "F":
                 self.buf += self.currChar
-        if prevState == "ID": #вставить зарезервированные слова
-            toReturm = 'Identificator'
+        #Для вывода:
+        if prevState == "ID": 
+            if self.buf in self.keyWords:
+                toReturm = 'Key Word'
+            else: toReturm = 'Identifier'
             self.fr.setPrev()
         if prevState == "N":
             toReturm = 'Number'
             self.fr.setPrev()
-        if prevState == "D": #изменить чтобы и операторы были и пр.
-            toReturm = 'Delimeter'
+        if prevState == "NF":
+            toReturm = 'Float Number'
+            self.fr.setPrev()
+        if prevState == "D":
+            if self.buf in self.operators:
+                toReturm = 'Operator'
+            else: toReturm = 'Delimiter'
             self.fr.setPrev()
         self.state = "S"
         if self.buf != '':
-            toReturm = str(self.buf) + " " + str(self.lexStartsFrom) + " " + toReturm
+            toReturm = str(self.buf) + ' ' + str(self.lexStartsFrom) + ' ' + toReturm
+        self.fw.write(toReturm + '\r')
         return toReturm
