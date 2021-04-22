@@ -24,10 +24,7 @@
     <Compile Include="FileReader.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Lexems.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Lexes.py">
+    <Compile Include="GetLex.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="main.py">
@@ -36,6 +33,9 @@
     <Compile Include="StatesTable.py">
       <SubType>Code</SubType>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="test.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

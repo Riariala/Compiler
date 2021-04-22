@@ -1,0 +1,5 @@
+Writeln 1-1 identificator
+( 1-8 delimter
+'Hello, World!' 1-9 string
+) 1-24 delimeter
+; 1-25 delimeter
