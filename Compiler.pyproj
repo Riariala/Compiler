@@ -11,6 +11,7 @@
     <OutputPath>.</OutputPath>
     <Name>Compiler</Name>
     <RootNamespace>Compiler</RootNamespace>
+    <SuppressConfigureTestFrameworkPrompt>true</SuppressConfigureTestFrameworkPrompt>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,10 +22,10 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="FileReader.py">
+    <Compile Include="GetLex.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="GetLex.py">
+    <Compile Include="Lexem.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="main.py">

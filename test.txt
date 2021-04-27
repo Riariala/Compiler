@@ -1,5 +1,0 @@
-Writeln 1 Identifier
-( 8 Delimiter
-'Hello, World!' 9 string
-) 24 Delimiter
-; 25 Delimiter

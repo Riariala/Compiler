@@ -1,4 +1,4 @@
-var a,n,c,d:word;
+var (* dsffsdf *) a,n,c,d:word; //dsfsdf
 begin { основная программа }
     readln( a );
     n:=1;
