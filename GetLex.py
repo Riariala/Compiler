@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import StatesTable
 import Lexem
 
@@ -8,7 +10,7 @@ class GetLex(object):
         self.operators = ['+', '-', '*', '/', '=', '>', '<','<>',':=','>=','<=','+=','-=','/=','*=']
         self.separ = [' ','\n', '\t', '\0', '\r']
         self.state = "S" 
-        self.fr = open(testname, 'r')
+        self.fr = open(testname, 'r', encoding="utf-8")
         self.currChar = ' '
         self.buf = ''
         self.lexStartsFrom = 0
@@ -27,8 +29,10 @@ class GetLex(object):
             if self.state == 'BACK':
                 self.state = 'D'
                 numbuf = self.buf[:len(self.buf)-2]
+                numstartPos = self.lexStartsFrom
                 self.buf = self.buf[len(self.buf)-2:] 
-                return Lexem.Lexem(numbuf, 'Integer', self.lexStartsFromLine, self.lexStartsFrom, False)
+                self.lexStartsFrom = self.currIndexChar - 2     #потому что ушло на 2 вперед, надо вернуться
+                return Lexem.Lexem(numbuf, 'Integer', self.lexStartsFromLine, numstartPos, False)
             if self.state == "ERR":
                 return Lexem.Lexem(self.buf, toReturm, self.lexStartsFromLine, self.lexStartsFrom, True) 
             prevState = self.state
@@ -50,7 +54,7 @@ class GetLex(object):
             if self.buf in self.keyWords:
                 toReturm = 'Key Word'
             else: toReturm = 'Identifier'
-        if prevState == "N":
+        if prevState == "N" or prevState == "16" or prevState == "8" or prevState == "2":
             toReturm = 'Integer'
         if prevState == "NFP" or prevState == "NFPORD" or prevState == "NFPE"or prevState == "NFPEO":
             toReturm = 'Float'
