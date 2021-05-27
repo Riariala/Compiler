@@ -59,7 +59,7 @@ class GetLex(object):
             self.type = 'Integer'
         if prevState == "NFP" or prevState == "NFPORD" or prevState == "NFPE"or prevState == "NFPEO":
             self.type = 'Float'
-        if prevState == "D" or prevState == "P":
+        if prevState == "D" or prevState == "P" or prevState == "BR" or prevState == "SL":
             if self.buf in self.operators:
                 self.type = 'Operator'
             elif self.buf in self.Delimiter: self.type = 'Delimiter'

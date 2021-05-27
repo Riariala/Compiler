@@ -5,14 +5,21 @@ class Node():
     def Print(self):
         pass
 
+class NodeRanger(Node):
+    def __init__(self, node):
+        self.node = node
+
+    def Print(self, space):
+        self.node.Print(space)
+
 class NumberNode(Node):
 
     def __init__(self, lex):
         self.lex = lex
         self.value = lex.mean
 
-    def Print(self, space):
-        print(" "*space,self.value)
+    def Print(self, fw, space):
+        fw.write(" "*space + str(self.value))
     
 class IdentNode(Node):
 
@@ -20,8 +27,8 @@ class IdentNode(Node):
         self.name = lex.lex
         self.lex = lex
 
-    def Print(self, space):
-        print(" "*space,self.name)
+    def Print(self,fw,  space):
+        fw.write(" "*space + self.name)
         
 class BinOpNode(Node):
 
@@ -31,7 +38,10 @@ class BinOpNode(Node):
         self.left = left
         self.right = right
 
-    def Print(self, space):
-        print(" " * space, self.operetion)
-        self.left.Print(space+1)
-        self.right.Print(space+1)
+    def Print(self, fw,  space):
+        fw.write(" " * space + self.operetion)
+        for i in self.left:
+            fw.write('\n')
+            i.Print(fw, space+1)
+        fw.write('\n')
+        self.right.Print(fw, space+1)
