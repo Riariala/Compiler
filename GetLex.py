@@ -7,7 +7,7 @@ class GetLex(object):
     def __init__(self, testname):
         self.keyWords = ['and', 'array', 'begin', 'case', 'const', 'div', 'do', 'downto', 'else', 'end', 'file', 'for', 'function', 'goto', 'if', 'in', 'label', 'mod', 'nil', 'not', 'of', 'or', 'packed', 'procedure', 'program', 'record', 'repeat', 'set', 'then', 'to', 'type', 'until', 'var', 'while', 'with']
         self.Delimiter = ['.', ';', ',', '(', ')',  '[', ']', ':', '{','}','$', '..']
-        self.operators = ['+', '-', '*', '/', '=', '>', '<','<>',':=','>=','<=','+=','-=','/=','*=']
+        self.operators = ['+', '-', '*', '/', '=', '>', '<','<>',':=','>=','<=','+=','-=','/=','*=', '^', "@"]
         self.separ = [' ','\n', '\t', '\0', '\r']
         self.state = "S" 
         self.fr = open(testname, 'r', encoding="utf-8")
@@ -58,7 +58,7 @@ class GetLex(object):
             toReturm = 'Integer'
         if prevState == "NFP" or prevState == "NFPORD" or prevState == "NFPE"or prevState == "NFPEO":
             toReturm = 'Float'
-        if prevState == "D":
+        if prevState == "D" or prevState == "P":
             if self.buf in self.operators:
                 toReturm = 'Operator'
             elif self.buf in self.Delimiter: toReturm = 'Delimiter'

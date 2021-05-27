@@ -30,10 +30,10 @@ class Lexem(object):
     def output(self):
         if self.error:
             return f'{self.line}' +'\t' + f'{self.charn}'+'\t' + 'ошибка в лексеме '+ f'{self.lex}'
-        if self.mean:
+        if self.mean != '':
             nummean = self.mean
             if type(self.mean) is int:
-                nummean = "{:.0f}".format(self.mean)
+                nummean = self.mean
             else:
                 nummean = "{0:.15f}".format(self.mean).rstrip('0')
             return f'{self.line}' +'\t' + f'{self.charn}'+'\t' + f'{self.type}'+'\t' + f'{self.lex}' + '\t' + f'{nummean}'

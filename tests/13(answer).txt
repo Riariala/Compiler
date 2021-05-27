@@ -26,7 +26,7 @@
 5	45	Delimiter	;
 6	6	Identifier	s
 6	7	Operator	:=
-6	9	Integer	0
+6	9	Integer	0	0
 6	10	Delimiter	;
 7	6	Key Word	for
 7	10	Identifier	i
