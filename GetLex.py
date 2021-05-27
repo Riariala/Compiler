@@ -18,8 +18,9 @@ class GetLex(object):
         self.currIndexChar = 0
         self.currLine = 1
         self.stateTable = StatesTable.StatesTable()
+        self.type = ''
 
-    def getLex(self):
+    def nextLex(self):
         toReturm = ''
         while True:
             if self.state == "S":
@@ -49,20 +50,27 @@ class GetLex(object):
 
         #Определение типа лексем:
         if prevState == "ENDSTR":
-            toReturm = 'String'
+            self.type = 'String'
         if prevState == "ID": 
             if self.buf in self.keyWords:
-                toReturm = 'Key Word'
-            else: toReturm = 'Identifier'
+                self.type = 'Key Word'
+            else: self.type = 'Identifier'
         if prevState == "N" or prevState == "16" or prevState == "8" or prevState == "2":
-            toReturm = 'Integer'
+            self.type = 'Integer'
         if prevState == "NFP" or prevState == "NFPORD" or prevState == "NFPE"or prevState == "NFPEO":
-            toReturm = 'Float'
+            self.type = 'Float'
         if prevState == "D" or prevState == "P":
             if self.buf in self.operators:
-                toReturm = 'Operator'
-            elif self.buf in self.Delimiter: toReturm = 'Delimiter'
+                self.type = 'Operator'
+            elif self.buf in self.Delimiter: self.type = 'Delimiter'
         self.state = "S"
         if self.buf != '':
-            return Lexem.Lexem(self.buf, toReturm, self.lexStartsFromLine, self.lexStartsFrom, False)
-        else: return ""
+            return Lexem.Lexem(self.buf, self.type, self.lexStartsFromLine, self.lexStartsFrom, False)
+        else: return Lexem.Lexem("", "Empty", self.lexStartsFromLine, self.lexStartsFrom, False)
+
+    def getLex(self):   #без смещения
+        if self.buf:
+            return Lexem.Lexem(self.buf, self.type, self.lexStartsFromLine, self.lexStartsFrom, False)
+        else:
+            lex = self.nextLex()
+            return lex

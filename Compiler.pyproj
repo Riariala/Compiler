@@ -31,12 +31,15 @@
     <Compile Include="main.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Node.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parse.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="StatesTable.py">
       <SubType>Code</SubType>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="test.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

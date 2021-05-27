@@ -11,7 +11,7 @@ class Lexem(object):
         self.mean = self.ismeannum()
 
     def ismeannum(self):
-        if not self.error:
+        if (not self.error) and self.lex:
             if self.lex[0] == "$":
                 return int(self.lex[1:], 16)
             elif self.lex[0] == "&":
@@ -28,6 +28,8 @@ class Lexem(object):
 
 
     def output(self):
+        if self.type == "Empty":
+            return ''
         if self.error:
             return f'{self.line}' +'\t' + f'{self.charn}'+'\t' + 'ошибка в лексеме '+ f'{self.lex}'
         if self.mean != '':
