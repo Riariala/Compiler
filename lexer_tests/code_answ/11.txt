@@ -10,7 +10,7 @@
 1	27	Identifier	word
 1	31	Delimiter	;
 2	1	Key Word	begin
-3	5	Identifier	readln
+3	5	Key Word	readln
 3	11	Delimiter	(
 3	13	Identifier	a
 3	15	Delimiter	)
@@ -48,7 +48,7 @@
 8	15	Integer	0	0
 8	17	Key Word	then
 8	22	Key Word	begin
-9	11	Identifier	writeln
+9	11	Key Word	writeln
 9	18	Delimiter	(
 9	20	Identifier	n
 9	22	Delimiter	)
@@ -58,7 +58,7 @@
 10	16	Operator	<>
 10	19	Identifier	d
 10	21	Key Word	then
-10	26	Identifier	writeln
+10	26	Key Word	writeln
 10	33	Delimiter	(
 10	35	Identifier	d
 10	37	Delimiter	)

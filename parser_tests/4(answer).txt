@@ -1,3 +1,9 @@
+var
+├word
+│├a
+│├n
+│├c
+│├d
 begin
 ├readln
 │├(

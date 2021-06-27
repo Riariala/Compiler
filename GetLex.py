@@ -19,8 +19,12 @@ class GetLex(object):
         self.currLine = 1
         self.stateTable = StatesTable.StatesTable()
         self.type = ''
+        self.numbuf = ''
+        self.numstartPos = ''
 
     def nextLex(self):
+        self.numbuf = ''
+        self.numstartPos = ''
         toReturm = ''
         while True:
             if self.state == "S":
@@ -29,11 +33,11 @@ class GetLex(object):
                 self.lexStartsFromLine = self.currLine
             if self.state == 'BACK':
                 self.state = 'D'
-                numbuf = self.buf[:len(self.buf)-2]
-                numstartPos = self.lexStartsFrom
+                self.numbuf = self.buf[:len(self.buf)-2]
+                self.numstartPos = self.lexStartsFrom
                 self.buf = self.buf[len(self.buf)-2:] 
                 self.lexStartsFrom = self.currIndexChar - 2     #потому что ушло на 2 вперед, надо вернуться
-                return Lexem.Lexem(numbuf, 'Integer', self.lexStartsFromLine, numstartPos, False)
+                return Lexem.Lexem(self.numbuf, 'Integer', self.lexStartsFromLine, self.numstartPos, False)
             if self.state == "ERR":
                 return Lexem.Lexem(self.buf, toReturm, self.lexStartsFromLine, self.lexStartsFrom, True) 
             prevState = self.state
@@ -69,6 +73,8 @@ class GetLex(object):
         else: return Lexem.Lexem("", "Empty", self.lexStartsFromLine, self.lexStartsFrom, False)
 
     def getLex(self):   #без смещения
+        if self.numbuf:
+            return Lexem.Lexem(self.numbuf, 'Integer', self.lexStartsFromLine, self.numstartPos, False)
         if self.buf:
             return Lexem.Lexem(self.buf, self.type, self.lexStartsFromLine, self.lexStartsFrom, False)
         else:

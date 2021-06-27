@@ -1,5 +1,5 @@
 1	1	Key Word	type
-2	2	Identifier	An
+2	2	Identifier	an
 2	5	Operator	=
 2	7	Operator	^
 2	8	Identifier	integer
@@ -11,7 +11,7 @@
 4	12	Delimiter	;
 5	2	Identifier	c
 5	4	Delimiter	:
-5	6	Identifier	An
+5	6	Identifier	an
 5	9	Operator	:=
 5	12	Operator	@
 5	13	Identifier	t

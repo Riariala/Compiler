@@ -11,6 +11,114 @@ class Expression(Node):
     def Print(self):
         pass
 
+class ProgrammNode(Node):
+    def __init__(self, stmts):
+        self.stmts = stmts
+
+    def Print(self, fw, space):
+        for i in self.stmts:
+            i.Print(fw, space)
+
+class ProgramNameNode(Node):
+    def __init__(self, lex, progname):
+        self.lex = lex
+        self.progname = progname
+
+    def Print(self, fw, space):
+         self.lex.Print(fw, space+1)
+         fw.write("├" + self.progname.lex + '\n')
+
+class ProgVarBlockNode(Node):
+    def __init__(self, lex, stmts):
+        self.lex = lex
+        self.stmts = stmts
+
+    def Print(self, fw, space):
+        self.lex.Print(fw, space)
+        for i in self.stmts:
+            i.Print(fw, space+1)
+
+class ProgVarNode(Node):
+    def __init__(self, varanme, _type, numnode, oprtn):
+        self.varanme = varanme
+        self.vartype = _type
+        self.numnode = numnode
+        self.oprtn = oprtn
+
+    def Print(self, fw, space):
+        if space != 0:
+            writeline = "│"*(space-1) + "├"
+        else:
+            writeline = ""
+        sp = space
+        self.vartype.Print(fw, sp)
+        if type(self.vartype) != NullNode:
+            sp+=1
+        self.oprtn.Print(fw, sp)
+        if type(self.oprtn) != NullNode:
+            sp+=1
+        writeline = "│" * (sp-1) + "├"
+        for i in self.varanme:
+            i.Print(fw,sp)
+        self.numnode.Print(fw, sp)
+
+class SingleTypeNode(Node):
+    def __init__(self, lex):
+        self.lex = lex
+        self.typename = lex.lex
+
+    def Print(self, fw, space):
+        if space != 0:
+            writeline = "│"*(space-1) + "├"
+        else:
+            writeline = ""
+        fw.write(writeline + str(self.typename)+'\n')
+
+class ArrTypeNode(Node):
+    def __init__(self, callW, ofType, ofW, diap, rbrc, lbrc):
+        self.callW = callW
+        self.ofType = ofType
+        self.ofW = ofW
+        self.diap = diap
+        self.rbrc = rbrc
+        self.lbrc = lbrc
+
+    def Print(self, fw, space):
+        if space != 0:
+            writeline = "│"*(space-1) + "├"
+        else:
+            writeline = ""
+        fw.write(writeline + str(self.callW.lex)+'\n')
+        self.ofW.Print(fw, space+1)
+        self.ofType.Print(fw, space+2)
+        writeline = "│"*(space) + "├"
+        fw.write(writeline + str(self.rbrc.lex)+'\n')
+        for i in self.diap:
+            i.Print(fw, space+2)
+        fw.write(writeline + str(self.lbrc.lex)+'\n')
+
+class DiapnNode(Node):
+    def __init__(self, delim, right, left):
+        self.delim = delim
+        self.right = right
+        self.left = left
+
+    def Print(self, fw, space):
+        if space != 0:
+            writeline = "│"*(space-1) + "├"
+        else:
+            writeline = ""
+        fw.write(writeline + str(self.delim.lex)+'\n')
+        self.right.Print( fw, space+1)
+        self.left.Print( fw, space+1)
+
+class FrrayInitNode(Node):
+    def __init__(self, varanme, _type, numnode, oprtn):
+        self.varanme = varanme
+        self.vartype = _type
+        self.numnode = numnode
+        self.oprtn = oprtn
+
 class StmtNode(Node):
     def __init__(self, stmt):
         self.stmt = stmt
@@ -50,6 +158,41 @@ class WhileNode(Node):
         self.condition.Print(fw, space+1)
         self.doW.Print( fw, space)
         self.body.Print(fw, space+1)
+
+class repeatUntilNode(Node):
+    def __init__(self, repeatW, cond, body, untilW:Node):
+        self.call = repeatW
+        self.condition = cond
+        self.body = body
+        self.untilW = untilW
+
+    def Print(self, fw, space):
+        if space != 0:
+            writeline = "│"*(space-1) + "├"
+        else:
+            writeline = ""
+        self.call.Print( fw, space)
+        self.body.Print(fw, space+1)
+        self.untilW.Print( fw, space)
+        self.condition.Print(fw, space+1)
+
+class ForNode(Node):
+    def __init__(self, callW, condit1, toW, condit2, doW, body : Node):
+        self.call = callW
+        self.condition1 = condit1
+        self.condition2 = condit2
+        self.body = body
+        self.toW = toW
+        self.doW = doW
+
+    def Print(self, fw, space):
+        self.call.Print( fw, space)
+        self.condition1.Print(fw, space+1)
+        self.toW.Print(fw, space)
+        self.condition2.Print(fw, space+1)
+        self.doW.Print(fw, space)
+        self.body.Print(fw, space+1)
+
 
 class IfNode(Node):
     def __init__(self, lex:Lexem.Lexem, cond, body,thenW, elsebody, elseW:Node):
@@ -266,3 +409,15 @@ class BoolOpNode(Node):
             i.Print(fw, space+1)
         for i in self.right:
             i.Print(fw, space+1)
+
+class VarAssignNode(Node):
+    def __init__(self, lex):
+        self.lex = lex
+        self.name = lex.lex
+
+    def Print(self, fw, space):
+        if space != 0:
+            writeline = "│"*(space-1) + "├"
+        else:
+            writeline = ""
+        fw.write(writeline + self.name + '\n')

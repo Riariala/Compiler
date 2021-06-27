@@ -1,0 +1,9 @@
+var a:= 1;
+b: integer = 25;
+begin
+  for var i:=1 to 50 do 
+    writeln(i);
+  writeln();
+  var
+    n: string;
+end.
