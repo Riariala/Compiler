@@ -61,6 +61,7 @@ class StatesTable(object):
         self.States["N"]['e'] = "NFPE"
 
     def getNewState(self, _state: str, _char: str):
+        _char = _char.lower()
         if _state =="COMS" or _state =="STR1" or _state =="STR2" or _state =="COM1" or _state =="COM2": 
             if _char == "":
                 return "S"

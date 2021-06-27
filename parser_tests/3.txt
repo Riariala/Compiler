@@ -1,0 +1,9 @@
+begin { основная программа }
+    readln( a );
+    n:=1;
+    while ( n <= sqrt(a) ) do begin
+       c:=a mod n;
+       d:=a div n;
+       inc( n );
+    end;
+end.

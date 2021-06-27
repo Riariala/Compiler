@@ -5,9 +5,9 @@ import Lexem
 
 class GetLex(object):
     def __init__(self, testname):
-        self.keyWords = ['and', 'array', 'begin', 'case', 'const', 'div', 'do', 'downto', 'else', 'end', 'file', 'for', 'function', 'goto', 'if', 'in', 'label', 'mod', 'nil', 'not', 'of', 'or', 'packed', 'procedure', 'program', 'record', 'repeat', 'set', 'then', 'to', 'type', 'until', 'var', 'while', 'with']
+        self.keyWords = ['readln', 'writeln','and', 'array', 'begin', 'case', 'const', 'div', 'do', 'downto', 'else', 'end', 'file', 'for', 'function', 'goto', 'if', 'in', 'label', 'mod', 'nil', 'not', 'of', 'or', 'packed', 'procedure', 'program', 'record', 'repeat', 'set', 'then', 'to', 'type', 'until', 'var', 'while', 'with']
         self.Delimiter = ['.', ';', ',', '(', ')',  '[', ']', ':', '{','}','$', '..']
-        self.operators = ['+', '-', '*', '/', '=', '>', '<','<>',':=','>=','<=','+=','-=','/=','*=', '^', "@"]
+        self.operators = ['+', '-', '*', '/', '=', '>', '<','<>',':=','>=','<=','+=','-=','/=','*=', '^', "@" ]
         self.separ = [' ','\n', '\t', '\0', '\r']
         self.state = "S" 
         self.fr = open(testname, 'r', encoding="utf-8")

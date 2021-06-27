@@ -3,7 +3,7 @@
 class Lexem(object):
 
     def __init__(self, _lex, _type, _line, _charn, _er):
-        self.lex = _lex
+        self.lex = _lex.lower()
         self.type = _type
         self.line = _line
         self.charn = _charn
@@ -18,6 +18,9 @@ class Lexem(object):
                 return int(self.lex[1:], 8)
             elif self.lex[0] == "%":
                 return int(self.lex[1:], 2)
+            elif self.type == "String":
+                mean = self.lex[1:len(self.lex)-1]
+                return mean
             try: 
                 mean = float(self.lex)
                 if mean.is_integer():
@@ -31,10 +34,12 @@ class Lexem(object):
         if self.type == "Empty":
             return ''
         if self.error:
-            return f'{self.line}' +'\t' + f'{self.charn}'+'\t' + 'ошибка в лексеме '+ f'{self.lex}'
+            return f'{self.line}' +'\t' + f'{self.charn}'+'\t' + 'ошибка в лексеме '
         if self.mean != '':
             nummean = self.mean
             if type(self.mean) is int:
+                nummean = self.mean
+            elif type(self.mean) is str:
                 nummean = self.mean
             else:
                 nummean = "{0:.15f}".format(self.mean).rstrip('0')
