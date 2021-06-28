@@ -37,6 +37,9 @@
     <Compile Include="Parse.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Semantic.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="StatesTable.py">
       <SubType>Code</SubType>
     </Compile>

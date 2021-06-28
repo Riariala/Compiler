@@ -1,5 +1,6 @@
 import GetLex
 import Parse
+import Semantic
 import os, os.path
 # -*- coding: utf-8 -*-
 
@@ -7,15 +8,15 @@ import os, os.path
 if __name__ == '__main__':
 
     # запуск и тестирование синтаксического анализатора:
-    lenth = len([name for name in os.listdir('parser_tests') if os.path.isfile("parser_tests\\"+name)])//2 +1
+    lenth = len([name for name in os.listdir('semantic_tests') if os.path.isfile("semantic_tests\\"+name)])//2 +1
     #print(lenth)
-    for i in range(1,lenth):
-        testname = "parser_tests\\"+str(i)+".txt"
-        answname = "parser_tests\\code_answ\\"+str(i)+".txt"
-        chackname = "parser_tests\\"+str(i)+"(answer).txt"
+    for i in range(4,lenth):
+        testname = "semantic_tests\\"+str(i)+".txt"
+        answname = "semantic_tests\\code_answ\\"+str(i)+".txt"
+        chackname = "semantic_tests\\"+str(i)+"(answer).txt"
         print(testname)
         fw = open(answname, 'w', encoding="utf-8")
-        parserper = Parse.Parser(testname)
+        parserper = Semantic.Parser(testname)
         itog = parserper.parseProgramm()
         itog.Print(fw, 0)
         fw.close()
@@ -32,6 +33,37 @@ if __name__ == '__main__':
                 if ar == "":
                     print(True)
                     break
+
+
+
+    ##--------------------------------------------------------------------------------------------------#
+
+    ## запуск и тестирование синтаксического анализатора:
+    #lenth = len([name for name in os.listdir('parser_tests') if os.path.isfile("parser_tests\\"+name)])//2 +1
+    ##print(lenth)
+    #for i in range(1,lenth):
+    #    testname = "parser_tests\\"+str(i)+".txt"
+    #    answname = "parser_tests\\code_answ\\"+str(i)+".txt"
+    #    chackname = "parser_tests\\"+str(i)+"(answer).txt"
+    #    print(testname)
+    #    fw = open(answname, 'w', encoding="utf-8")
+    #    parserper = Parse.Parser(testname)
+    #    itog = parserper.parseProgramm()
+    #    itog.Print(fw, 0)
+    #    fw.close()
+    #    #Вывод итога теста:
+    #    with open(answname, "r", encoding="utf-8") as thisf, open(chackname, "r", encoding="utf-8") as correct:
+    #        while True:
+    #            ar = thisf.readline()
+    #            cr = correct.readline()
+    #            if ar != cr:
+    #                print(False)
+    #                print("ошбика в выражении "+ str(cr))
+    #                print(cr + ar)
+    #                break
+    #            if ar == "":
+    #                print(True)
+    #                break
 
     ##--------------------------------------------------------------------------------------------------#
 
