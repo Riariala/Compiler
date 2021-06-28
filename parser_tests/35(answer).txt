@@ -7,11 +7,9 @@ procedure
 │├)
 ├begin
 │├writeln
-││├(
-│││├+
-││││├a
-││││├b
-││├)
+││├+
+│││├a
+│││├b
 ├end
 var
 ├integer

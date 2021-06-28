@@ -9,11 +9,9 @@ function
 │├integer
 ├begin
 │├writeln
-││├(
-│││├+
-││││├a
-││││├b
-││├)
+││├+
+│││├a
+│││├b
 ├end
 var
 ├integer

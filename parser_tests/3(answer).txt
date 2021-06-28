@@ -3,7 +3,5 @@ var
 │├a
 begin
 ├readln
-│├(
-││├a
-│├)
+│├a
 end

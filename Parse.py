@@ -252,8 +252,10 @@ class Parser():
             stmt = Node.KeyWordNode(self.curlex)
         elif self.curlex.type == "Identifier":
             stmt = self.parseAssigmOrFunc()
-        elif self.curlex.lex == "readln" or self.curlex.lex == "writeln":
-            stmt = self.parseAssigmOrFunc()
+        elif self.curlex.lex == "readln": 
+            stmt = self.parseReadln()
+        elif self.curlex.lex == "writeln":
+            stmt = self.parseWriteln()
         elif self.curlex.lex == "end" or self.curlex.lex == ";" :
             return Node.NullNode()
         if stmt:
@@ -261,6 +263,43 @@ class Parser():
         else:
             return Node.NullNode()
 
+    def parseWriteln(self):
+        callW = Node.KeyWordNode(self.lexAnalizer.getLex())
+        err = self.Require(['writeln'])
+        if err:
+            return Node.ErrorNode(err)
+        oplex = self.lexAnalizer.getLex()
+        err = self.Require(['('])
+        if err:
+            return Node.ErrorNode(err)
+        tooutput = []
+        while oplex.lex ==',' or oplex.lex =='(':
+            tooutput.append(self.parseExpression())
+            oplex = self.lexAnalizer.getLex()
+        err = self.Require([')'])
+        if err:
+            return Node.ErrorNode(err)
+        return Node.WritelnNode(callW, tooutput)
+
+
+    def parseReadln(self):
+        callW = Node.KeyWordNode(self.lexAnalizer.getLex())
+        err = self.Require(['readln'])
+        if err:
+            return Node.ErrorNode(err)
+        oplex = self.lexAnalizer.getLex()
+        err = self.Require(['('])
+        if err:
+            return Node.ErrorNode(err)
+        toinput = []
+        while oplex.lex ==',' or oplex.lex =='(':
+            toinput.append(self.parseExpression())
+            oplex = self.lexAnalizer.getLex()
+        err = self.Require([')'])
+        if err:
+            return Node.ErrorNode(err)
+        return Node.ReadlnNode(callW, toinput)
+        
     def parseAssigmOrFunc(self):
         left = self.parseFactor()
         self.curlex = self.lexAnalizer.getLex()

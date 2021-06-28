@@ -9,7 +9,5 @@ begin
 ││├0
 ├then
 │├writeln
-││├(
-│││├n
-││├)
+││├n
 end

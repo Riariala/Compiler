@@ -439,6 +439,26 @@ class NullNode(Node):
     def Print(self, fw, space):
         pass
 
+class WritelnNode(Node):
+    def __init__(self, callW, toinput):
+        self.callW = callW
+        self.toinput = toinput
+
+    def Print(self, fw, space):
+        self.callW.Print(fw, space)
+        for i in self.toinput:
+            i.Print(fw, space+1)
+
+class ReadlnNode(Node):
+    def __init__(self,callW, tooutput):
+        self.callW = callW
+        self.tooutput = tooutput
+
+    def Print(self, fw, space):
+        self.callW.Print(fw, space)
+        for i in self.tooutput:
+            i.Print(fw, space+1)
+
 
 class AssignNode(Node):
     def __init__(self, lex, right, left):
