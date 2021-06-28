@@ -3,7 +3,7 @@ var
 │├of
 ││├integer
 │├[
-││├1.1
+││├,
 │├]
 │├a
 begin

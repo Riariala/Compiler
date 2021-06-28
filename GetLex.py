@@ -36,8 +36,6 @@ class GetLex(object):
                 self.numbuf = self.buf[:len(self.buf)-2]
                 self.numstartPos = self.lexStartsFrom
                 self.buf = self.buf[len(self.buf)-2:]
-                #if self.buf[-1] != ".": 
-                    #self.buf = self.buf[0]
                 self.lexStartsFrom = self.currIndexChar - 2     #потому что ушло на 2 вперед, надо вернуться
                 return Lexem.Lexem(self.numbuf, 'Integer', self.lexStartsFromLine, self.numstartPos, False)
             if self.state == "ERR":

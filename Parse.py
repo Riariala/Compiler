@@ -23,6 +23,12 @@ class Parser():
             return f'Строка  {str(self.lexAnalizer.lexStartsFromLine)}, символ {str(self.lexAnalizer.lexStartsFrom)}. Встречено {self.lexAnalizer.getLex().lex} ожидалось "{waited}"'
         return
 
+    def checkNodeType(self, Nodetypes, nodetocheck):
+        if type(nodetocheck) in Nodetypes:
+            self.catcherror = True
+            return f'Строка  {str(self.lexAnalizer.lexStartsFromLine)}, символ {str(self.lexAnalizer.lexStartsFrom)}. Встречено {self.lexAnalizer.getLex().lex} ожидалось выражение'
+        return
+
     def parseProgramm(self):
         stmts = []
         self.curlex = self.lexAnalizer.getLex()
@@ -137,6 +143,8 @@ class Parser():
     def parseVar(self):
         self.curlex = self.lexAnalizer.getLex()
         varnames = []
+        if self.curlex.type == 'Delimiter':
+            return(Node.NullNode())
         err = self.RequireType(["Identifier"])
         if err:
                 return Node.ErrorNode(err)
@@ -205,10 +213,16 @@ class Parser():
     def parseDiap(self):
         fromexpr = self.parseExpression()
         delim = self.lexAnalizer.getLex()
+        if delim.lex in [',', ']']:
+            return fromexpr
         err = self.Require(['..',','])
         if err:
                 return Node.ErrorNode(err)
         toexpr = self.parseExpression()
+        if type(fromexpr) == Node.NullNode:
+            return Node.ErrorNode(f'Строка {str(self.lexAnalizer.lexStartsFromLine) }, символ {str(self.lexAnalizer.lexStartsFrom)}. Встречено {self.curlex.lex}, ожидалось выражение')
+        if type(toexpr) == Node.NullNode:
+            return Node.ErrorNode(f'Строка {str(self.lexAnalizer.lexStartsFromLine) }, символ {str(self.lexAnalizer.lexStartsFrom)}. Встречено {self.curlex.lex}, ожидалось выражение')
         return Node.DiapnNode(delim, fromexpr, toexpr)
 
     def parseStmt(self):
@@ -279,7 +293,7 @@ class Parser():
         close = Node.KeyWordNode(self.lexAnalizer.getLex())
         err = self.Require(['end'])
         if err:
-                return Node.ErrorNode(err)
+            return Node.ErrorNode(err)
         return Node.BlockNode(stmnts, open, close)
     
     def parseWhile(self):
@@ -347,21 +361,31 @@ class Parser():
         return Node.IfNode(call, expression, body, thenW, elsebody, elseW)
 
     def parseExpression(self):
+        if self.catcherror:
+            return Node.NullNode()
         left = self.parseTerm()
         oplex = self.lexAnalizer.getLex()
         leftpoints = left
         while (oplex.type == "Operator" or oplex.type == "Key Word") and oplex.lex.lower() in ['+','-', 'or','xor']:
             self.curlex = self.lexAnalizer.nextLex()
             right = self.parseTerm()
+            err = self.checkNodeType([Node.NullNode], right)
+            if err:
+                return Node.ErrorNode(err)
             leftpoints = Node.BinOpNode(oplex, [leftpoints], right)
             oplex = self.lexAnalizer.getLex()
         if (oplex.type == "Operator" or oplex.type == "Key Word") and oplex.lex.lower() in ['=','<>', '<','>', '>=', '<=', 'in']:
             self.curlex = self.lexAnalizer.nextLex()
             right = self.parseExpression()
+            err = self.checkNodeType([Node.NullNode], right)
+            if err:
+                return Node.ErrorNode(err)
             return Node.BoolOpNode(oplex, [leftpoints], [right])
         return leftpoints
 
     def parseTerm(self):
+        if self.catcherror:
+            return Node.NullNode()
         left = self.parseFactor()
         oplex = self.lexAnalizer.getLex()
         leftpoints = [left]
@@ -373,6 +397,9 @@ class Parser():
             if oplex.lex.lower() in ['*','/', 'div','mod', 'as', 'is', 'and']:
                 self.curlex = self.lexAnalizer.nextLex() 
                 right = self.parseFactor()
+                err = self.checkNodeType([Node.NullNode], right)
+                if err:
+                    return Node.ErrorNode(err)
                 leftpoints = [Node.BinOpNode(oplex, leftpoints, right)]
                 oplex = self.lexAnalizer.getLex()
             else:
@@ -380,15 +407,20 @@ class Parser():
         return leftpoints[0]
 
     def parseFactor(self):
+        if self.catcherror:
+            return Node.NullNode()
         self.curlex = self.lexAnalizer.getLex()
         oplex = self.lexAnalizer.getLex()
         if oplex.lex.lower() in ['not','+', '-','^', '@']:
             operation = oplex
             self.lexAnalizer.nextLex()
             right = self.parseFactor()
+            err = self.checkNodeType([Node.NullNode], right)
+            if err:
+                return Node.ErrorNode(err)
             return Node.UnarOpNode(operation, right)
-        self.lexAnalizer.nextLex() 
         if self.curlex.type == "Identifier" or self.curlex.lex == "readln" or self.curlex.lex == "writeln":
+            self.lexAnalizer.nextLex() 
             oplex = self.lexAnalizer.getLex()   
             if oplex.type == "Delimiter" and oplex.lex == "[":
                 main = self.curlex
@@ -417,17 +449,21 @@ class Parser():
                 return Node.callNode(main, mid, open, self.curlex)
             return Node.IdentNode(self.curlex)
         elif self.curlex.type == "Integer" or self.curlex.type == "Float":  
+            self.lexAnalizer.nextLex() 
             return Node.NumberNode(self.curlex)
         elif self.curlex.type == "String":
+            self.lexAnalizer.nextLex() 
             return Node.StringConstNode(self.curlex)
         elif self.curlex.lex == "(":
+            self.lexAnalizer.nextLex() 
             self.curlex = self.lexAnalizer.getLex()
             curNode = self.parseExpression()
+            err = self.checkNodeType([Node.NullNode], curNode)
+            if err:
+                return Node.ErrorNode(err)
             self.curlex = self.lexAnalizer.getLex()
             err = self.Require([")"])
             if err:
                     return Node.ErrorNode(err)
             return curNode
         return Node.NullNode()
-
-

@@ -91,11 +91,16 @@ class ArrTypeNode(Node):
         fw.write(writeline + str(self.callW.lex)+'\n')
         self.ofW.Print(fw, space+1)
         self.ofType.Print(fw, space+2)
-        writeline = "│"*(space) + "├"
-        fw.write(writeline + str(self.rbrc.lex)+'\n')
+        writeline1 = "│"*(space) + "├"
+        fw.write(writeline1 + str(self.rbrc.lex)+'\n')
+        writeline2 = "│"*(space+1) + "├"
+        sp = space+2
+        if len(self.diap) >1:
+            fw.write(writeline2 + ',\n')
+            sp = space+3
         for i in self.diap:
-            i.Print(fw, space+2)
-        fw.write(writeline + str(self.lbrc.lex)+'\n')
+            i.Print(fw, sp)
+        fw.write(writeline1 + str(self.lbrc.lex)+'\n')
 
 class DiapnNode(Node):
     def __init__(self, delim, right, left):

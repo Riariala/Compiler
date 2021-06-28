@@ -23,7 +23,7 @@ if __name__ == '__main__':
         with open(answname, "r", encoding="utf-8") as thisf, open(chackname, "r", encoding="utf-8") as correct:
             while True:
                 ar = thisf.readline()
-                cr = correct.readline() 
+                cr = correct.readline()
                 if ar != cr:
                     print(False)
                     print("ошбика в выражении "+ str(cr))
