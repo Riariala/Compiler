@@ -7,7 +7,7 @@ class GetLex(object):
     def __init__(self, testname):
         self.keyWords = ['readln', 'writeln','and', 'array', 'begin', 'case', 'const', 'div', 'do', 'downto', 'else', 'end', 'file', 'for', 'function', 'goto', 'if', 'in', 'label', 'mod', 'nil', 'not', 'of', 'or', 'packed', 'procedure', 'program', 'record', 'repeat', 'set', 'then', 'to', 'type', 'until', 'var', 'while', 'with']
         self.Delimiter = ['.', ';', ',', '(', ')',  '[', ']', ':', '{','}','$', '..']
-        self.operators = ['+', '-', '*', '/', '=', '>', '<','<>',':=','>=','<=','+=','-=','/=','*=', '^', "@" ]
+        self.operators = ['+', '-', '*', '/', '=', '>', '<','<>',':=','>=','<=','+=','-=','/=','*=', '^', "@"]
         self.separ = [' ','\n', '\t', '\0', '\r']
         self.state = "S" 
         self.fr = open(testname, 'r', encoding="utf-8")
@@ -35,7 +35,9 @@ class GetLex(object):
                 self.state = 'D'
                 self.numbuf = self.buf[:len(self.buf)-2]
                 self.numstartPos = self.lexStartsFrom
-                self.buf = self.buf[len(self.buf)-2:] 
+                self.buf = self.buf[len(self.buf)-2:]
+                #if self.buf[-1] != ".": 
+                    #self.buf = self.buf[0]
                 self.lexStartsFrom = self.currIndexChar - 2     #потому что ушло на 2 вперед, надо вернуться
                 return Lexem.Lexem(self.numbuf, 'Integer', self.lexStartsFromLine, self.numstartPos, False)
             if self.state == "ERR":
@@ -63,7 +65,7 @@ class GetLex(object):
             self.type = 'Integer'
         if prevState == "NFP" or prevState == "NFPORD" or prevState == "NFPE"or prevState == "NFPEO":
             self.type = 'Float'
-        if prevState == "D" or prevState == "P" or prevState == "BR" or prevState == "SL":
+        if prevState in ["D", "P","BR","SL"]:
             if self.buf in self.operators:
                 self.type = 'Operator'
             elif self.buf in self.Delimiter: self.type = 'Delimiter'

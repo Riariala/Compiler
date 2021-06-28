@@ -1,0 +1,19 @@
+var g: real;
+begin
+     g := 2*5;
+     writeln(g);
+     if (g=30) then
+     begin
+       g-=2;
+       writeln(g);
+     end;
+     begin 
+        writeln('Все норм');
+	      writeln(g);
+     end;
+end.
+begin 
+        writeln('Все норм');
+	      writeln(g);
+     end;
+

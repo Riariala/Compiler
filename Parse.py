@@ -126,6 +126,12 @@ class Parser():
             stmt = Node.ProgVarBlockNode(varW, [self.parseVar()])
         elif self.curlex.lex == "for":
             stmt = self.parseFor()
+        elif self.curlex.lex == "break":
+            self.lexAnalizer.nextLex()
+            stmt = Node.KeyWordNode(self.curlex)
+        elif self.curlex.lex == "continue":
+            self.lexAnalizer.nextLex()
+            stmt = Node.KeyWordNode(self.curlex)
         elif self.curlex.type == "Identifier":
             stmt = self.parseAssigmOrFunc()
         elif self.curlex.lex == "readln" or self.curlex.lex == "writeln":
@@ -183,7 +189,7 @@ class Parser():
         self.Require(['for'])
         condit1 = self.parseStmt()
         toW = Node.KeyWordNode(self.lexAnalizer.getLex())
-        self.Require(['to'])
+        self.Require(['to', 'downto'])
         condit2 = self.parseExpression()
         doW = Node.KeyWordNode(self.lexAnalizer.getLex())
         self.Require(['do'])

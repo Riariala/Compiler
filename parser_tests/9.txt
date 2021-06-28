@@ -1,0 +1,7 @@
+var g: real;
+begin
+     g := 2*5;
+     for var i:=10 downto 1 do begin
+        writeln(i);
+     end;
+end.
