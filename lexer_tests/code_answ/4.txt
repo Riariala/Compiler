@@ -1,3 +1,0 @@
-1	1	String	'assdf sdfsd sdf eeerw'	assdf sdfsd sdf eeerw
-2	1	String	"sdf sdfsdfewefsd sd fdsf "	sdf sdfsdfewefsd sd fdsf 
-3	1	String	"dsfs 'fds' sdfsdf"	dsfs 'fds' sdfsdf

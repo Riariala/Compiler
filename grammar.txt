@@ -1,61 +1,44 @@
-actual_value= expression 
-expression= simple_expression [ relational_operator simple_expression ] .
-simple_expression= [ '+' | '-' ] term { addition_operator term } .
+integer_number= NUMBER .
+real_number= NUMBER .
+label= NUMBER .
 relational_operator= '=' | '<>' | '<' | '<=' | '>' | '>=' | IN .
 multiplication_operator= '*' | '/' | DIV | MOD | AND .
 addition_operator= '+' | '-' | OR .
-label= NUMBER .
 constant= [ '+' | '-' ] ( CONSTANT_NAME | number ) | STRING .
 number= integer_number | real_number .
-integer_number= NUMBER .
-real_number= NUMBER .
+factor= NUMBER | STRING | CONSTANT_NAME | variable | '(' expression ')' | NOT factor .
 term= factor { multiplication_operator factor } .
-factor= NUMBER | STRING | NIL | CONSTANT_NAME | set | variable  | function_designator | '(' expression ')' | NOT factor .
-
-set= '[' element_list ']' .
+expression = [ '+' | '-' ] term { addition_operator term } .
 element_list= [ expression { ',' expression } ] .
-
-variable= entire_variable | component_variable | referenced_variable .
-entire_variable= VARIABLE_NAME | FIELD_NAME .
-component_variable= indexed_variable | field_designator.
-referenced_variable= pointer_variable '^' .
+variable= VARIABLE_NAME | indexed_variable | field_designator .
 indexed_variable= array_variable '[' expression_list ']' .
 field_designator= record_variable '.' FIELD_NAME .
-pointer_variable= variable .
-array_variable= variable .
-record_variable= variable .
 expression_list= expression { ',' expression } .
-
 function_designator= FUNCTION_NAME [ actual_parameter_list ] .
+actual_value= expression 
 actual_parameter_list= '(' actual_parameter { ',' actual_parameter } ')' .
 actual_parameter= actual_value | actual_variable | actual_procedure | actual_function .
 actual_variable= variable .
 actual_procedure= PROCEDURE_NAME .
 actual_function= FUNCTION_NAME .
-
 array_type= ARRAY '[' index_type { ',' index_type } ']' OF element_type .
 index_type= simple_type .
-simple_type= subrange_type | enumerated_type .
+simple_type= subrange_type .
 subrange_type= lower_bound '..' upper_bound .
 lower_bound= constant .
 upper_bound= constant .
 bound_specification= NAME '..' NAME ':' ordinal_type_identifier .
 ordinal_type_identifier= TYPE_NAME .
-
 element_type= type .
-enumerated_type= '(' identifier_list ')' .
-identifier_list= NAME { ',' NAME } .
 type= simple_type | TYPE_NAME .
 base_type= type .
-
-assignment_statement= ( variable | FUNCTION_NAME ) ':=' expression .
+assignment_statement= variable  ':=' expression .
 block= declaration_part statement_part .
-
 statement_part= BEGIN statement_sequence END .
 statement_sequence= statement { ';' statement } .
 statement= [ LABEL ':' ] ( simple_statement | structured_statement ) .
-simple_statement= [ assignment_statement | *procedure_statement] .
-*procedure_statement= PROCEDURE_NAME [ actual_parameter_list ] .
+simple_statement= [ assignment_statement | procedure_statement] .
+procedure_statement= PROCEDURE_NAME [ actual_parameter_list ] .
 structured_statement= compound_statement | repetitive_statement   | conditional_statement .
 compound_statement= BEGIN statement_sequence END .
 repetitive_statement= while_statement | repeat_statement | for_statement .
@@ -66,24 +49,23 @@ for_statement= FOR VARIABLE_NAME ':=' initial_expression ( TO | DOWNTO )  final_
 initial_expression= expression .
 final_expression= expression .
 conditional_statement= if_statement .
-
 declaration_part= [ label_declaration_part ] [ constant_definition_part ]
-  [ type_definition_part ] [ variable_declaration_part ]
 label_declaration_part= LABEL label { ',' label } ';' .
 constant_definition_part= CONST constant_definition ';' { constant_definition ';' } .
 constant_definition= NAME '=' constant .
-type_definition_part= TYPE type_definition ';' { type_definition ';' } .
-type_definition= NAME '=' type .
 variable_declaration_part= VAR variable_declaration ';' { variable_declaration ';' } .
 variable_declaration= identifier_list ':' type .
-
-case_label_list= constant { ',' constant } .
-conformant_array_schema= unpacked_conformant_array_schema .
-unpacked_conformant_array_schema= ARRAY '[' bound_specification { ';' bound_specification } ']' OF ( TYPE_NAME | conformant_array_schema ) .
-
-
-
-
-
-
-
+parameter_type= TYPE_NAME .
+identifier_list= NAME { ',' NAME } .
+result_type= TYPE_NAME .
+value_parameter_section= identifier_list ':' parameter_type .
+variable_parameter_section= VAR NAME ':' parameter_type .
+formal_parameter_section= value_parameter_section .
+formal_parameter_list= '(' formal_parameter_section { ';' formal_parameter_section } ')' .
+procedure_heading= PROCEDURE NAME [ formal_parameter_list ] .
+function_heading= FUNCTION NAME [ formal_parameter_list ] ':' result_type .
+procedure_declaration= procedure_heading ';' block .
+function_declaration= function_heading ';' block .
+procedure_and_function_declaration_part= { ( procedure_declaration | function_declaration ) ';' } .
+program_heading= PROGRAM NAME '(' identifier_list ')' ';' .
+program= program_heading block '.' .

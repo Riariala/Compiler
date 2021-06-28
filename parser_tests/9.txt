@@ -1,7 +1,4 @@
-var g: real;
+var a,n:integer;
 begin
-     g := 2*5;
-     for var i:=10 downto 1 do begin
-        writeln(i);
-     end;
+	n += sqrt(a)*2-1
 end.

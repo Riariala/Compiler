@@ -142,6 +142,67 @@ class BlockNode(Node):
             i.Print(fw, space+1)
         self.closeW.Print( fw, space)
 
+class FuncNode(Node):
+    def __init__(self, callW, funcName, rbrac, lbrac, dotdot,resulttype, body, args):
+        self.callW = callW
+        self.funcName = funcName
+        self.rbrac = rbrac
+        self.lbrac = lbrac
+        self.dotdot = dotdot
+        self.resulttype = resulttype
+        self.body = body
+        self.args = args
+
+    def Print(self, fw, space):
+        self.callW.Print(fw, space)
+        writeline1 = "│"*space + "├"
+        fw.write(writeline1 + str(self.funcName.lex)+'\n')
+        writeline2 = "│"*(space+1) + "├"
+        fw.write(writeline2 + str(self.rbrac.lex)+'\n')
+        for i in self.args:
+            i.Print(fw, space+3)
+        fw.write(writeline2 + str(self.lbrac.lex)+'\n')
+        fw.write(writeline1 + str(self.dotdot.lex)+'\n')
+        fw.write(writeline2 + str(self.resulttype.lex)+'\n')
+        self.body.Print(fw, space+1)
+
+
+class ProcedureNode(Node):
+    def __init__(self, callW, funcName, rbrac, lbrac, body, args):
+        self.callW = callW
+        self.funcName = funcName
+        self.rbrac = rbrac
+        self.lbrac = lbrac
+        self.body = body
+        self.args = args
+
+    def Print(self, fw, space):
+        self.callW.Print(fw, space)
+        writeline1 = "│"*space + "├"
+        fw.write(writeline1 + str(self.funcName.lex)+'\n')
+        writeline2 = "│"*(space+1) + "├"
+        fw.write(writeline2 + str(self.rbrac.lex)+'\n')
+        for i in self.args:
+            i.Print(fw, space+3)
+        fw.write(writeline2 + str(self.lbrac.lex)+'\n')
+        self.body.Print(fw, space+1)
+
+class FuncProcRefArg(Node):
+    def __init__(self, callW, varNode):
+        self.callW = callW
+        self.varNode = varNode
+
+    def Print(self, fw, space):
+        self.callW.Print(fw, space)
+        self.varNode.Print(fw, space+1)
+
+class FuncProcValArg(Node):
+    def __init__(self, varNode):
+        self.varNode = varNode
+
+    def Print(self, fw, space):
+        self.varNode.Print(fw, space)
+
 class WhileNode(Node):
     def __init__(self, lex, cond, body,doW:Node):
         self.call = lex
@@ -421,3 +482,10 @@ class VarAssignNode(Node):
         else:
             writeline = ""
         fw.write(writeline + self.name + '\n')
+
+class ErrorNode(Node):
+    def __init__(self, errortext:str):
+        self.errortext = errortext
+
+    def Print(self, fw, space):
+        fw.write(self.errortext + '\n')

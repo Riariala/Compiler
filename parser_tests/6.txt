@@ -1,9 +1,4 @@
-var a:= 1;
-b: integer = 25;
+var a:string;
 begin
-  for var i:=1 to 50 do 
-    writeln(i);
-  writeln();
-  var
-    n: string;
+	readln( a ));
 end.
