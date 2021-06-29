@@ -7,7 +7,11 @@ import sys
 
 
 if __name__ == '__main__':
-    testtype = sys.argv[1]
+    testtype = '4'
+    try:
+        testtype = sys.argv[1]
+    except:
+        pass
     if testtype == '1':
         directory = 'lexer_tests'
     elif testtype == '2':

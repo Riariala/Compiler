@@ -1,6 +1,1 @@
-var
-├a
-│├string
-begin
 Строка 4, символ 1. Нельзя преобразовать тип integer к string
-end

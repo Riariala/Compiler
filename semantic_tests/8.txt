@@ -1,5 +1,4 @@
 var a:integer;
 begin 
-	a:=38;
-	a:=380;
+	a:=5*'55'
 end.

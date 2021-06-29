@@ -1,5 +1,5 @@
 var a:integer;
+n:float;
 begin 
-	a:=38;
-	a:=380;
+	n:=a/5
 end.

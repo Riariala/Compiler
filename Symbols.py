@@ -443,29 +443,18 @@ class IdentNode(Expression):
         #fw.write(writeline + self.name+'\n')
         
 class BinOpNode(Expression):
+    def __init__(self, lexref):
+        self.lexref = lexref
 
-    def __init__(self, oplex, left, right):
-        self.oplex = oplex
-        self.operetion = oplex.lex
-        self.left = left
-        self.right = right
-
-    def Print(self, fw, space):
-        if space != 0:
-            writeline = "│"*(space-1) + "├"
-        else:
-            writeline = ""
-        fw.write(writeline + self.operetion+'\n')
-        for i in self.left:
-            i.Print(fw, space+1)
-        self.right.Print(fw, space+1)
+    def Print(self,fw,  space):
+        self.lexref.Print(fw,  space+1)
 
 class UnarOpNode(Expression):
     def __init__(self, lexref):
         self.lexref = lexref
 
     def Print(self,fw,  space):
-        self.lexref.Print(fw,  space+1)
+        self.lexref.Print(fw,  space)
 
 class RecordNode(Expression):
     def __init__(self, lex, left, right):
@@ -608,5 +597,4 @@ class ErrorNode(Node):
         self.errortext = errortext
 
     def Print(self, fw, space):
-        fw.write(self.errortext + '\n')
-
+        fw.write(str(self.errortext) + '\n')

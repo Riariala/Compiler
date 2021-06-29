@@ -1,5 +1,5 @@
 var a:integer;
+n:string;
 begin 
-	a:=38;
-	a:=380;
+	a:=n+ 'frd'
 end.

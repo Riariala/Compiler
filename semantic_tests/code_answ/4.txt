@@ -5,8 +5,8 @@ begin
 ├:=
 │├a
 ││├integer
-││├-
-│││├38
-││││├integer
+│├-
+││├38
 │││├integer
+││├integer
 end
