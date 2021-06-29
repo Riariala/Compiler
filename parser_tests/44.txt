@@ -1,0 +1,9 @@
+function DoAdd(a,b: integer):integer
+begin
+  writeln(a + b);
+end;
+
+var a: integer;
+begin
+	a:=DoAdd(1,2)
+end.

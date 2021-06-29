@@ -2,30 +2,62 @@ import GetLex
 import Parse
 import Semantic
 import os, os.path
+import sys
 # -*- coding: utf-8 -*-
 
 
 if __name__ == '__main__':
+    testtype = sys.argv[1]
+    if testtype == '1':
+        directory = 'lexer_tests'
+    elif testtype == '2':
+        directory = 'parse_tests'
+    elif testtype == '3':
+        directory = 'parser_tests'
+    elif testtype == '4':
+        directory = 'semantic_tests'
+    else: raise Exception("Введите 1 для лексического анализатора, 2 для простых выражений, 3 для синтаксического анализатора, 4 для семантического.")
 
     # запуск и тестирование синтаксического анализатора:
-    lenth = len([name for name in os.listdir('semantic_tests') if os.path.isfile("semantic_tests\\"+name)])//2 +1
-    #print(lenth)
-    for i in range(4,lenth):
-        testname = "semantic_tests\\"+str(i)+".txt"
-        answname = "semantic_tests\\code_answ\\"+str(i)+".txt"
-        chackname = "semantic_tests\\"+str(i)+"(answer).txt"
+    lenth = len([name for name in os.listdir(directory) if os.path.isfile(directory+"\\"+name)])//2 +1
+    for i in range(1,lenth):
+        testname = directory+"\\"+str(i)+".txt"
+        answname = directory+"\\code_answ\\"+str(i)+".txt"
+        chackname = directory+"\\"+str(i)+"(answer).txt"
         print(testname)
         fw = open(answname, 'w', encoding="utf-8")
-        parserper = Semantic.Parser(testname)
-        itog = parserper.parseProgramm()
-        itog.Print(fw, 0)
+        if testtype == '1':
+            lexAnalizer = GetLex.GetLex(testname)
+            try:
+                lexem = lexAnalizer.getLex()
+                while lexem.lex:
+                    fw.write(lexem.output() +'\n')
+                    lexem = lexAnalizer.nextLex()
+            except Exception as e:
+                fw.write(str(e))
+        elif testtype == '2':
+            parserper = Parse.Parser(testname)
+            try:
+                itog = parserper.parseExpression()
+                itog.Print(fw, 0)
+            except Exception as e:
+                fw.write(str(e))
+        elif testtype == '3':
+            parserper = Parse.Parser(testname)
+            itog = parserper.parseProgramm()
+            itog.Print(fw, 0)
+        elif testtype == '4':
+            parserper = Semantic.Parser(testname)
+            itog = parserper.parseProgramm()
+            itog.Print(fw, 0)
         fw.close()
+
         #Вывод итога теста:
         with open(answname, "r", encoding="utf-8") as thisf, open(chackname, "r", encoding="utf-8") as correct:
             while True:
                 ar = thisf.readline()
                 cr = correct.readline()
-                if ar != cr:
+                if ar.split() != cr.split():
                     print(False)
                     print("ошбика в выражении "+ str(cr))
                     print(cr + ar)
@@ -34,97 +66,3 @@ if __name__ == '__main__':
                     print(True)
                     break
 
-
-
-    ##--------------------------------------------------------------------------------------------------#
-
-    ## запуск и тестирование синтаксического анализатора:
-    #lenth = len([name for name in os.listdir('parser_tests') if os.path.isfile("parser_tests\\"+name)])//2 +1
-    ##print(lenth)
-    #for i in range(1,lenth):
-    #    testname = "parser_tests\\"+str(i)+".txt"
-    #    answname = "parser_tests\\code_answ\\"+str(i)+".txt"
-    #    chackname = "parser_tests\\"+str(i)+"(answer).txt"
-    #    print(testname)
-    #    fw = open(answname, 'w', encoding="utf-8")
-    #    parserper = Parse.Parser(testname)
-    #    itog = parserper.parseProgramm()
-    #    itog.Print(fw, 0)
-    #    fw.close()
-    #    #Вывод итога теста:
-    #    with open(answname, "r", encoding="utf-8") as thisf, open(chackname, "r", encoding="utf-8") as correct:
-    #        while True:
-    #            ar = thisf.readline()
-    #            cr = correct.readline()
-    #            if ar != cr:
-    #                print(False)
-    #                print("ошбика в выражении "+ str(cr))
-    #                print(cr + ar)
-    #                break
-    #            if ar == "":
-    #                print(True)
-    #                break
-
-    ##--------------------------------------------------------------------------------------------------#
-
-    ## запуск и тестирование парсера выражений:
-    #lenth = len([name for name in os.listdir('parse_tests') if os.path.isfile("parse_tests\\"+name)])//2 +1
-    ##print(lenth)
-    #for i in range(1,lenth):
-    #    testname = "parse_tests\\"+str(i)+".txt"
-    #    answname = "parse_tests\\code_answ\\"+str(i)+".txt"
-    #    chackname = "parse_tests\\"+str(i)+"(answer).txt"
-    #    print(testname)
-    #    fw = open(answname, 'w', encoding="utf-8")
-    #    parserper = Parse.Parser(testname)
-    #    itog = parserper.parseExpression()
-    #    itog.Print(fw, 0)
-    #    fw.close()
-    #    #Вывод итога теста:
-    #    with open(answname, "r", encoding="utf-8") as thisf, open(chackname, "r", encoding="utf-8") as correct:
-    #        while True:
-    #            ar = thisf.readline()
-    #            cr = correct.readline() 
-    #            if ar != cr:
-    #                print(False)
-    #                print("ошбика в выражении "+ str(cr))
-    #                print(cr + ar)
-    #                break
-    #            if ar == "":
-    #                print(True)
-    #                break
-
-
-    ##--------------------------------------------------------------------------------------------------#
-    
-    # #запуск и тестирование лексера:
-    #lenth = len([name for name in os.listdir('lexer_tests') if os.path.isfile("lexer_tests\\"+name)])//2 +1
-    #for i in range(1,lenth): #номера файлов, увеличивать при новых тестах
-    #    testname = "lexer_tests\\"+str(i)+".txt"
-    #    answname = "lexer_tests\\code_answ\\"+str(i)+".txt"
-    #    chackname = "lexer_tests\\"+str(i)+"(answer).txt"
-    #    print(testname)
-    #    lexAnalizer = GetLex.GetLex(testname)
-    #    fw = open(answname, 'w', encoding="utf-8")
-    #    lexem = lexAnalizer.getLex()
-    #    while lexem.lex:
-    #        fw.write(lexem.output())
-    #        if lexem.error:
-    #            break
-    #        lexem = lexAnalizer.nextLex()
-    #        if lexem.lex:
-    #            fw.write( '\n')
-    #    fw.close()
-    #    #Вывод итога теста:
-    #    with open(answname, "r", encoding="utf-8") as thisf, open(chackname, "r", encoding="utf-8") as correct:
-    #        while True:
-    #            ar = thisf.readline()
-    #            cr = correct.readline() 
-    #            if ar != cr:
-    #                print(False)
-    #                print("ошбика на символе "+str(cr))
-    #                print(cr + ar)
-    #                break
-    #            if ar == "":
-    #                print(True)
-    #                break

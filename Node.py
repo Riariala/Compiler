@@ -160,13 +160,19 @@ class FuncNode(Node):
 
     def Print(self, fw, space):
         self.callW.Print(fw, space)
+        sp = space
         writeline1 = "│"*space + "├"
         fw.write(writeline1 + str(self.funcName.lex)+'\n')
-        writeline2 = "│"*(space+1) + "├"
-        fw.write(writeline2 + str(self.rbrac.lex)+'\n')
+        writeline2 = "│"*(space +1) + "├"
+        sp+=2
+        if self.rbrac:
+            fw.write(writeline2 + str(self.rbrac.lex)+'\n')
+            sp = space + 3
         for i in self.args:
-            i.Print(fw, space+3)
-        fw.write(writeline2 + str(self.lbrac.lex)+'\n')
+            i.Print(fw, sp)
+        if self.lbrac:
+            fw.write(writeline2 + str(self.lbrac.lex)+'\n')
+            sp -= 1
         fw.write(writeline1 + str(self.dotdot.lex)+'\n')
         fw.write(writeline2 + str(self.resulttype.lex)+'\n')
         self.body.Print(fw, space+1)
@@ -183,13 +189,18 @@ class ProcedureNode(Node):
 
     def Print(self, fw, space):
         self.callW.Print(fw, space)
+        sp = space
         writeline1 = "│"*space + "├"
         fw.write(writeline1 + str(self.funcName.lex)+'\n')
-        writeline2 = "│"*(space+1) + "├"
-        fw.write(writeline2 + str(self.rbrac.lex)+'\n')
+        writeline2 = "│"*(space +1) + "├"
+        sp+=2
+        if self.rbrac:
+            fw.write(writeline2 + str(self.rbrac.lex)+'\n')
+            sp = space + 3
         for i in self.args:
-            i.Print(fw, space+3)
-        fw.write(writeline2 + str(self.lbrac.lex)+'\n')
+            i.Print(fw, sp)
+        if self.lbrac:
+            fw.write(writeline2 + str(self.lbrac.lex)+'\n')
         self.body.Print(fw, space+1)
 
 class FuncProcRefArg(Node):
@@ -513,4 +524,4 @@ class ErrorNode(Node):
         self.errortext = errortext
 
     def Print(self, fw, space):
-        fw.write(self.errortext + '\n')
+        fw.write(str(self.errortext) + '\n')

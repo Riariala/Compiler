@@ -1,0 +1,6 @@
+function DoAdd:integer
+begin
+  writeln(a + b);
+end;
+begin
+end.

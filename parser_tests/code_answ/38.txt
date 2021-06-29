@@ -1,0 +1,10 @@
+var
+├array
+│├of
+││├integer
+│├[
+││├,
+│├]
+│├a
+begin
+end

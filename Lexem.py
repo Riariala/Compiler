@@ -2,16 +2,15 @@
 
 class Lexem(object):
 
-    def __init__(self, _lex, _type, _line, _charn, _er):
+    def __init__(self, _lex, _type, _line, _charn):
         self.lex = _lex.lower()
         self.type = _type
         self.line = _line
         self.charn = _charn
-        self.error = _er
         self.mean = self.ismeannum()
 
     def ismeannum(self):
-        if (not self.error) and self.lex:
+        if  self.lex:
             if self.lex[0] == "$":
                 return int(self.lex[1:], 16)
             elif self.lex[0] == "&":
@@ -29,12 +28,9 @@ class Lexem(object):
             except: pass
         return ""
 
-
     def output(self):
         if self.type == "Empty":
             return ''
-        if self.error:
-            return f'{self.line}' +'\t' + f'{self.charn}'+'\t' + 'ошибка в лексеме '
         if self.mean != '':
             nummean = self.mean
             if type(self.mean) is int:
@@ -44,5 +40,4 @@ class Lexem(object):
             else:
                 nummean = "{0:.15f}".format(self.mean).rstrip('0')
             return f'{self.line}' +'\t' + f'{self.charn}'+'\t' + f'{self.type}'+'\t' + f'{self.lex}' + '\t' + f'{nummean}'
-        if not self.error:
-            return f'{self.line}' +'\t' + f'{self.charn}'+'\t' + f'{self.type}'+'\t' + f'{self.lex}'
+        return f'{self.line}' +'\t' + f'{self.charn}'+'\t' + f'{self.type}'+'\t' + f'{self.lex}'

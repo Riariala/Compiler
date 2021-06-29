@@ -37,9 +37,9 @@ class GetLex(object):
                 self.numstartPos = self.lexStartsFrom
                 self.buf = self.buf[len(self.buf)-2:]
                 self.lexStartsFrom = self.currIndexChar - 2     #потому что ушло на 2 вперед, надо вернуться
-                return Lexem.Lexem(self.numbuf, 'Integer', self.lexStartsFromLine, self.numstartPos, False)
+                return Lexem.Lexem(self.numbuf, 'Integer', self.lexStartsFromLine, self.numstartPos)
             if self.state == "ERR":
-                return Lexem.Lexem(self.buf, toReturm, self.lexStartsFromLine, self.lexStartsFrom, True) 
+                raise Exception(f'Строка  {str(self.lexStartsFromLine)}, символ {str(self.lexStartsFrom)}. Встречена лексическая ошибка в лексеме "{self.buf}"')
             prevState = self.state
             self.state = self.stateTable.getNewState(self.state, self.currChar)
             if self.state != "F":
@@ -69,14 +69,14 @@ class GetLex(object):
             elif self.buf in self.Delimiter: self.type = 'Delimiter'
         self.state = "S"
         if self.buf != '':
-            return Lexem.Lexem(self.buf, self.type, self.lexStartsFromLine, self.lexStartsFrom, False)
-        else: return Lexem.Lexem("", "Empty", self.lexStartsFromLine, self.lexStartsFrom, False)
+            return Lexem.Lexem(self.buf, self.type, self.lexStartsFromLine, self.lexStartsFrom)
+        else: return Lexem.Lexem("", "Empty", self.lexStartsFromLine, self.lexStartsFrom)
 
     def getLex(self):   #без смещения
         if self.numbuf:
-            return Lexem.Lexem(self.numbuf, 'Integer', self.lexStartsFromLine, self.numstartPos, False)
+            return Lexem.Lexem(self.numbuf, 'Integer', self.lexStartsFromLine, self.numstartPos)
         if self.buf:
-            return Lexem.Lexem(self.buf, self.type, self.lexStartsFromLine, self.lexStartsFrom, False)
+            return Lexem.Lexem(self.buf, self.type, self.lexStartsFromLine, self.lexStartsFrom)
         else:
             lex = self.nextLex()
             return lex

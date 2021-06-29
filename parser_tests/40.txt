@@ -1,0 +1,3 @@
+function DoAdd( var a: integer):integer;begin end;
+begin
+end.

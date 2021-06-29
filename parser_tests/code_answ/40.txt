@@ -1,0 +1,13 @@
+function
+├doadd
+│├(
+││├var
+│││├integer
+││││├a
+│├)
+├:
+│├integer
+├begin
+├end
+begin
+end
