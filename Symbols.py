@@ -2,11 +2,9 @@ from abc import ABC, abstractmethod
 
 import Lexem
 
-
 class Symbol():
     def __init__(self, name):
         self.name = name
-
 
 class SymType(Symbol):
     def __init__(self, name):
@@ -104,10 +102,6 @@ class SymExpr(Symbol):
         self.left.Print(fw, space+1)
         self.right.Print(fw, space+1)
         self.typeref.Print(fw, space+1)
-
-
-
-
 
 #-----------------NODES TO SYMBOLS DUPLICATE----------------------#
 class Node():
@@ -239,20 +233,18 @@ class StmtNode(Node):
         self.stmt.Print(fw, space)
 
 class BlockNode(Node):
-    def __init__(self, stmts, open, close):
+    def __init__(self, stmts):
         self.stmts = stmts
-        self.openW = open
-        self.closeW = close
 
     def Print(self, fw, space):
         if space != 0:
             writeline = "│"*(space-1) + "├"
         else:
             writeline = ""
-        self.openW.Print( fw, space)
+        fw.write(writeline + 'begin\n')
         for i in self.stmts:
             i.Print(fw, space+1)
-        self.closeW.Print( fw, space)
+        fw.write(writeline + 'end\n')
 
 class FuncNode(Node):
     def __init__(self, callW, funcName, rbrac, lbrac, dotdot,resulttype, body, args):
@@ -316,64 +308,59 @@ class FuncProcValArg(Node):
         self.varNode.Print(fw, space)
 
 class WhileNode(Node):
-    def __init__(self, lex, cond, body,doW:Node):
-        self.call = lex
+    def __init__(self,cond, body):
         self.condition = cond
         self.body = body
-        self.doW = doW
 
     def Print(self, fw, space):
         if space != 0:
             writeline = "│"*(space-1) + "├"
         else:
             writeline = ""
-        self.call.Print( fw, space)
+        fw.write(writeline + 'while\n')
         self.condition.Print(fw, space+1)
-        self.doW.Print( fw, space)
+        fw.write(writeline + 'do\n')
         self.body.Print(fw, space+1)
 
 class repeatUntilNode(Node):
-    def __init__(self, repeatW, cond, body, untilW:Node):
-        self.call = repeatW
+    def __init__(self, cond, body):
         self.condition = cond
         self.body = body
-        self.untilW = untilW
 
     def Print(self, fw, space):
         if space != 0:
             writeline = "│"*(space-1) + "├"
         else:
             writeline = ""
-        self.call.Print( fw, space)
+        fw.write(writeline + 'repeat\n')
         self.body.Print(fw, space+1)
-        self.untilW.Print( fw, space)
+        fw.write(writeline + 'until\n')
         self.condition.Print(fw, space+1)
 
 class ForNode(Node):
-    def __init__(self, callW, condit1, toW, condit2, doW, body : Node):
-        self.call = callW
+    def __init__(self, condit1, condit2, body, toW):
         self.condition1 = condit1
         self.condition2 = condit2
         self.body = body
         self.toW = toW
-        self.doW = doW
 
     def Print(self, fw, space):
-        self.call.Print( fw, space)
+        if space != 0:
+            writeline = "│"*(space-1) + "├"
+        else:
+            writeline = ""
+        fw.write(writeline + 'for\n')
         self.condition1.Print(fw, space+1)
-        self.toW.Print(fw, space)
+        fw.write(writeline + self.toW.lex +'\n')
         self.condition2.Print(fw, space+1)
-        self.doW.Print(fw, space)
+        fw.write(writeline + 'do\n')
         self.body.Print(fw, space+1)
 
 
 class IfNode(Node):
-    def __init__(self, lex:Lexem.Lexem, cond, body,thenW, elsebody, elseW:Node):
-        self.call = lex
+    def __init__(self, cond, body, elsebody):
         self.condition = cond
         self.body = body
-        self.thenW = thenW
-        self.elseW = elseW
         self.elsebody = elsebody
 
     def Print(self, fw, space):
@@ -381,12 +368,13 @@ class IfNode(Node):
             writeline = "│"*(space-1) + "├"
         else:
             writeline = ""
-        self.call.Print( fw, space)
+        fw.write(writeline + 'if\n')
         self.condition.Print(fw, space+1)
-        self.thenW.Print( fw, space)
+        fw.write(writeline + 'then\n')
         self.body.Print(fw, space+1)
-        self.elseW.Print( fw, space)
-        self.elsebody.Print(fw, space+1)
+        if type(self.elsebody) != NullNode:
+            fw.write(writeline + 'else\n')
+            self.elsebody.Print(fw, space+1)
 
 class KeyWordNode(Node):
      def __init__(self, lex):
@@ -415,11 +403,6 @@ class NumberNode(Expression):
 
     def Print(self, fw, space):
         self.lexref.Print(fw, space)
-        #if space != 0:
-        #    writeline = "│"*(space-1) + "├"
-        #else:
-        #    writeline = ""
-        #fw.write(writeline + str(self.value)+'\n')
 
 class StringConstNode(Expression):
 
@@ -436,11 +419,6 @@ class IdentNode(Expression):
 
     def Print(self,fw,  space):
         self.lexref.Print(fw,  space)
-        #if space != 0:
-        #    writeline = "│"*(space-1) + "├"
-        #else:
-        #    writeline = ""
-        #fw.write(writeline + self.name+'\n')
         
 class BinOpNode(Expression):
     def __init__(self, lexref):
@@ -549,7 +527,7 @@ class AssignNode(Node):
         self.operation = lex.lex
         self.lex = lex
         self.right = right
-        self.left = left
+        self.lexref = left
 
     def Print(self, fw, space):
         if space != 0:
@@ -557,7 +535,7 @@ class AssignNode(Node):
         else:
             writeline = ""
         fw.write(writeline + self.operation + '\n')
-        for i in [self.left]:
+        for i in [self.lexref]:
             i.Print(fw, space+1)
         for i in [self.right]:
             i.Print(fw, space+1)

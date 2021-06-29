@@ -8,8 +8,10 @@ import sys
 
 if __name__ == '__main__':
     testtype = '4'
+    starttest = 1
     try:
         testtype = sys.argv[1]
+        starttest = int(sys.argv[2])
     except:
         pass
     if testtype == '1':
@@ -24,7 +26,8 @@ if __name__ == '__main__':
 
     # запуск и тестирование синтаксического анализатора:
     lenth = len([name for name in os.listdir(directory) if os.path.isfile(directory+"\\"+name)])//2 +1
-    for i in range(1,lenth):
+    if starttest>=lenth or starttest<=0: starttest =1
+    for i in range(starttest,lenth):
         testname = directory+"\\"+str(i)+".txt"
         answname = directory+"\\code_answ\\"+str(i)+".txt"
         chackname = directory+"\\"+str(i)+"(answer).txt"

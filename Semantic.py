@@ -26,6 +26,9 @@ class Parser():
         if type(nodetocheck) in Nodetypes:
             raise Exception(f'Строка  {str(self.lexAnalizer.lexStartsFromLine)}, символ {str(self.lexAnalizer.lexStartsFrom)}. Встречено "{self.lexAnalizer.getLex().lex}", ожидалось выражение')
 
+    def errorshow(self, massage):
+        raise Exception(f'Строка  {str(self.lexAnalizer.lexStartsFromLine)}, символ {str(self.lexAnalizer.lexStartsFrom)}. {massage}')
+
     def parseProgramm(self):
         try:
             stmts = []
@@ -66,7 +69,7 @@ class Parser():
         if self.curlex.lex not in self.stackTable[-1]:
             self.stackTable[-1][self.curlex.lex] = ''
         else:
-            raise Exception(f'Строка {str(self.lexAnalizer.lexStartsFromLine) }, символ {str(self.lexAnalizer.lexStartsFrom)}. Переменная {str(self.curlex.lex)} объявлена повторно')
+            self.errorshow(f'Переменная {str(self.curlex.lex)} объявлена повторно')
 
         #varibl = self.parseFactor()
         oplex = self.lexAnalizer.nextLex()
@@ -74,12 +77,10 @@ class Parser():
         while oplex.lex == ",":
             self.curlex = self.lexAnalizer.nextLex()
             self.RequireType(["Identifier"])
-
             if self.curlex.lex not in self.stackTable[-1]:
                 self.stackTable[-1][self.curlex.lex] = ''
             else:
-                raise Exception(f'Строка {str(self.lexAnalizer.lexStartsFromLine) }, символ {str(self.lexAnalizer.lexStartsFrom)}. Переменная {str(self.curlex.lex)} объявлена повторно')
-
+                self.errorshow(f'Переменная {str(self.curlex.lex)} объявлена повторно')
             varibl = self.parseFactor()
             varnames.append(self.curlex)
             oplex = self.lexAnalizer.getLex()
@@ -87,16 +88,15 @@ class Parser():
         self.Require([":", ":="])
         self.curlex = self.lexAnalizer.getLex()
         if self.curlex.lex ==";":
-            raise Exception(f'Строка {str(self.lexAnalizer.lexStartsFromLine) }, символ {str(self.lexAnalizer.lexStartsFrom)}. Встречено {str(self.curlex.lex)}, ожидалось выражение')
+            self.errorshow(f'Встречено {str(self.curlex.lex)}, ожидалось выражение')
         if self.curlex.type =="Identifier" and oprtn.name == ':':
             vartype = self.curlex.lex
-
             oprtn = Symbols.NullNode()
             self.curlex = self.lexAnalizer.nextLex()
             exprnode = Symbols.NullNode()
-        elif self.curlex.type =="Identifier" and oprtn.name == ':=':
+        elif oprtn.name == ':=':
             exprnode = self.parseExpression()
-            vartype = exprnode.symbref.type_name
+            vartype = exprnode.lexref.typeref.name
         varnodeslist = []
         for i in varnames:
             self.stackTable[-1][i.lex] = Symbols.SymType(vartype)
@@ -117,9 +117,9 @@ class Parser():
         elif self.curlex.lex == "repeat":
             stmt = self.parseRepeatUntil()
         elif self.curlex.lex == "var":
-            self.lexAnalizer.nextLex()
             varW = Symbols.KeyWordNode(self.curlex)
-            stmt = Symbols.ProgVarBlockNode(varW, [self.parseVar()])
+            self.lexAnalizer.nextLex()
+            stmt = Symbols.ProgVarBlockNode(varW, self.parseVar())
         elif self.curlex.lex == "for":
             stmt = self.parseFor()
         elif self.curlex.lex == "break":
@@ -137,9 +137,8 @@ class Parser():
         elif self.curlex.lex == "end" or self.curlex.lex == ";" :
             return Symbols.NullNode()
         if stmt:
-            return Symbols.StmtNode(stmt)
-        else:
-            return Symbols.NullNode()
+            return stmt
+        return Symbols.NullNode()
 
     def parseWriteln(self):
         callW = Symbols.KeyWordNode(self.lexAnalizer.getLex())
@@ -169,6 +168,7 @@ class Parser():
     def parseAssigmOrFunc(self):
         left = self.parseFactor() #Node
         self.curlex = self.lexAnalizer.getLex()
+        #lexreftype = left.lexref.typeref
         if self.curlex.lex in [";", "end"]:
             return left
         elif self.curlex.lex in  [":=","+=","-=","*=","/="]:
@@ -176,15 +176,15 @@ class Parser():
             self.lexAnalizer.nextLex()
             right = self.parseExpression()
             if left.lexref.typeref.name != right.lexref.typeref.name:
-                raise Exception(f'Строка {str(self.lexAnalizer.lexStartsFromLine) }, символ {str(self.lexAnalizer.lexStartsFrom)}. Нельзя преобразовать тип {str(right.lexref.typeref.name)} к {str(left.lexref.typeref.name)}')
+                self.errorshow(f'Нельзя преобразовать тип {str(right.lexref.typeref.name)} к {str(left.lexref.typeref.name)}')
             return Symbols.AssignNode(oper, right, left)
         else:
             self.Require([":=","+=","-=","*=","/="])
             
 
     def parseBlock(self):
-        open = Symbols.KeyWordNode(self.lexAnalizer.getLex())
         self.Require(['begin'])
+        self.stackTable.append(OrderedDict())
         self.curlex = self.lexAnalizer.getLex()
         stmnts = []
         while self.curlex.lex != "end":
@@ -193,84 +193,104 @@ class Parser():
             if self.curlex.lex != ";":
                 break;
             self.lexAnalizer.nextLex()
-        close = Symbols.KeyWordNode(self.lexAnalizer.getLex())
         self.Require(['end'])
-        return Symbols.BlockNode(stmnts, open, close)
+        self.stackTable.pop()
+        return Symbols.BlockNode(stmnts)
     
     def parseWhile(self):
-        call = Symbols.KeyWordNode(self.lexAnalizer.getLex())
         self.Require(['while'])
         expression = self.parseExpression()
-        doW = Symbols.KeyWordNode(self.lexAnalizer.getLex())
+        if expression.lexref.typeref.name!="boolean":
+            self.errorshow(f'Условие должно быть типа boolean')
         self.Require(['do'])
         body = self.parseStmt()
-        return Symbols.WhileNode(call, expression, body, doW)
+        return Symbols.WhileNode(expression, body)
 
     def parseRepeatUntil(self):
-        call = Symbols.KeyWordNode(self.lexAnalizer.getLex())
         self.Require(['repeat'])
         body = self.parseStmt()
-        untilW = Symbols.KeyWordNode(self.lexAnalizer.getLex())
         self.Require(['until'])
         expression = self.parseExpression()
-        return Symbols.repeatUntilNode(call, expression, body, untilW)
+        if expression.lexref.typeref.name!="boolean":
+            self.errorshow(f'Условие должно быть типа boolean')
+        return Symbols.repeatUntilNode(expression, body)
 
     def parseFor(self):
-        call = Symbols.KeyWordNode(self.lexAnalizer.getLex())
         self.Require(['for'])
+        self.stackTable.append(OrderedDict())
         condit1 = self.parseStmt()
-        toW = Symbols.KeyWordNode(self.lexAnalizer.getLex())
+        try:
+            if condit1.lexref.lexref.typeref.name!="integer":
+                self.errorshow(f'Ожидался тип integer')
+        except:
+            if condit1.stmts[0].vartype.name!="integer":
+                self.errorshow(f'Ожидался тип integer')
+                ProgVarBlockNode
+        toW = self.lexAnalizer.getLex()
         self.Require(['to', 'downto'])
         condit2 = self.parseExpression()
-        doW = Symbols.KeyWordNode(self.lexAnalizer.getLex())
+        try:
+            if condit2.lexref.typeref.name!="integer":
+                self.errorshow(f'Ожидался тип integer')
+        except:
+            if condit2.stmts[0].vartype.name!="integer":
+                self.errorshow(f'Ожидался тип integer')
+                ProgVarBlockNode
         self.Require(['do'])
         body = self.parseStmt()
-        return Symbols.ForNode(call, condit1, toW, condit2, doW, body)
+        self.stackTable.pop()
+        return Symbols.ForNode(condit1, condit2, body, toW)
 
     def parseIf(self):
-        call = Symbols.KeyWordNode(self.lexAnalizer.getLex())
         self.Require(['if'])
         expression = self.parseExpression()
-        thenW = Symbols.KeyWordNode(self.lexAnalizer.getLex())
+        if expression.lexref.typeref.name!="boolean":
+            self.errorshow(f'Условие должно быть типа boolean')
         self.Require(['then'])
         body = self.parseStmt()
         if self.lexAnalizer.getLex() == 'else':
-            elseW = Symbols.KeyWordNode(self.lexAnalizer.getLex())
             self.lexAnalizer.nextLex()
             elsebody = self.parseStmt()
         else:
-            elseW = Symbols.NullNode()
             elsebody = Symbols.NullNode()
-        return Symbols.IfNode(call, expression, body, thenW, elsebody, elseW)
+        return Symbols.IfNode(expression, body, elsebody)
 
     def parseExpression(self):
         left = self.parseTerm()
         oplex = self.lexAnalizer.getLex()
         leftpoints =[left]
-        while (oplex.type == "Operator" or oplex.type == "Key Word") and oplex.lex.lower() in ['+','-', 'or']:
+        while (oplex.type == "Operator" or oplex.type == "Key Word") and oplex.lex in ['+','-', 'or']:
             self.curlex = self.lexAnalizer.nextLex()
             right = self.parseTerm()
             if oplex.lex == "or":
-                newtyperef = "boolean"
+                if right.lexref.typeref.name=="boolean" and left.lexref.typeref.name=="boolean":
+                    newtyperef = right.lexref.typeref
+                else:
+                    self.errorshow(f'Нельзя сравнить типы {str(right.lexref.typeref.name)} и {str(left.lexref.typeref.name)}')
             elif oplex.lex == '-':
                 if right.lexref.typeref.name=="string" or left.lexref.typeref.name=="string":
-                    raise Exception(f'Строка {str(self.lexAnalizer.lexStartsFromLine) }, символ {str(self.lexAnalizer.lexStartsFrom)}. Оператор "{oplex.lex}" не применим к типу "String"')
+                    self.errorshow(f'Оператор "{oplex.lex}" не применим к типу "String"')
             newtyperef = right.lexref.typeref
             if left.lexref.typeref.name == right.lexref.typeref.name:
                 symexpr = Symbols.SymExpr(oplex, left, right, newtyperef)
+            elif left.lexref.typeref.name in ['integer', 'float'] and right.lexref.typeref.name in ['integer', 'float']:
+                if oplex.lex in ['-','+']:
+                    newtyperef = Symbols.SymType("float")
+                else:
+                    newtyperef = Symbols.SymType("integer")
+                symexpr = Symbols.SymExpr(oplex, left, right, newtyperef)
             else:
-                raise Exception(f'Строка {str(self.lexAnalizer.lexStartsFromLine) }, символ {str(self.lexAnalizer.lexStartsFrom)}. Нельзя преобразовать тип {str(right.lexref.typeref.name)} к {str(left.lexref.typeref.name)}')
+                self.errorshow(f'Нельзя преобразовать тип {str(right.lexref.typeref.name)} к {str(left.lexref.typeref.name)}')
             leftpoints = [Symbols.BinOpNode(symexpr)]
             oplex = self.lexAnalizer.getLex()
-
-        if (oplex.type == "Operator" or oplex.type == "Key Word") and oplex.lex.lower() in ['=','<>', '<','>', '>=', '<=', 'in']:
+        if (oplex.type == "Operator" or oplex.type == "Key Word") and oplex.lex in ['=','<>', '<','>', '>=', '<=', 'in']:
             self.curlex = self.lexAnalizer.nextLex()
             right = self.parseExpression()
             newtyperef = Symbols.SymType("boolean")
             if left.lexref.typeref.name == right.lexref.typeref.name:
                 symexpr = Symbols.SymExpr(oplex, left, right, newtyperef)
             else:
-                raise Exception(f'Строка {str(self.lexAnalizer.lexStartsFromLine) }, символ {str(self.lexAnalizer.lexStartsFrom)}. Нельзя сравнить переменные типа {str(right.lexref.typeref.name)} и {str(left.lexref.typeref.name)}')
+                self.errorshow(f'Нельзя сравнить переменные типа {str(right.lexref.typeref.name)} и {str(left.lexref.typeref.name)}')
             leftpoints = [Symbols.BinOpNode(symexpr)]
             oplex = self.lexAnalizer.getLex()
             return leftpoints[0]
@@ -281,22 +301,35 @@ class Parser():
         oplex = self.lexAnalizer.getLex()
         leftpoints = [left]
         while oplex.type == "Operator" or oplex.type == "Key Word":
-            if oplex.lex in ['*','/', 'div','mod', 'as', 'is', 'and']:
+            if oplex.lex in ['*','/', 'div','mod', 'and']:
                 self.curlex = self.lexAnalizer.nextLex() 
                 right = self.parseFactor()
                 if oplex.lex == "and":
-                    newtyperef = Symbols.SymType("boolean")
+                    if right.lexref.typeref.name=="boolean" and left.lexref.typeref.name=="boolean":
+                        newtyperef = right.lexref.typeref
+                    else:
+                        self.errorshow(f'Нельзя сравнить типы {str(right.lexref.typeref.name)} и {str(left.lexref.typeref.name)}')
                 elif oplex.lex in ["/", 'div','mod']:
                     if right.lexref.typeref.name=="string" or left.lexref.typeref.name=="string":
-                        raise Exception(f'Строка {str(self.lexAnalizer.lexStartsFromLine) }, символ {str(self.lexAnalizer.lexStartsFrom)}. Оператор "{oplex.lex}" не применим к типу "String"')
-                    if oplex.lex == '/':
+                        self.errorshow(f'Оператор "{oplex.lex}" не применим к типу "String"')
+                    elif oplex.lex=="/":
                         newtyperef = Symbols.SymType("float")
+                    else:
+                        newtyperef = right.lexref.typeref
                 else:
                     newtyperef = right.lexref.typeref
                 if left.lexref.typeref.name == right.lexref.typeref.name:
                     symexpr = Symbols.SymExpr(oplex, left, right, newtyperef)
+                elif left.lexref.typeref.name in ['integer', 'float'] and right.lexref.typeref.name in ['integer', 'float']:
+                    if oplex.lex in ['/'] or left.lexref.typeref.name == 'float' or left.lexref.typeref.name == 'float':
+                        newtyperef = Symbols.SymType("float")
+                    elif oplex.lex in ['div','mod']:
+                        newtyperef = Symbols.SymType("integer")
+                    else:
+                        self.errorshow("Операция {oplex.lex} не применима к переменым такого типа")
+                    symexpr = Symbols.SymExpr(oplex, left, right, newtyperef)
                 else:
-                    raise Exception(f'Строка {str(self.lexAnalizer.lexStartsFromLine) }, символ {str(self.lexAnalizer.lexStartsFrom)}. Нельзя преобразовать тип {str(right.lexref.typeref.name)} к {str(left.lexref.typeref.name)}')
+                    self.errorshow(f'Нельзя преобразовать тип {str(right.lexref.typeref.name)} к {str(left.lexref.typeref.name)}')
                 leftpoints = [Symbols.BinOpNode(symexpr)]
                 oplex = self.lexAnalizer.getLex()
             else:
@@ -315,13 +348,13 @@ class Parser():
             return Symbols.UnarOpNode(symexpr)
         if self.curlex.type == "Identifier":
             ident = self.curlex
-            if ident.lex in self.stackTable[-1]:
-                self.lexAnalizer.nextLex() 
-                oplex = self.lexAnalizer.getLex()   
-                symb_var = Symbols.SymVar(ident, self.stackTable[-1][ident.lex])
-                return Symbols.IdentNode(symb_var)
-            else:
-                return Symbols.ErrorNode(f'Строка {str(self.lexAnalizer.lexStartsFromLine) }, символ {str(self.lexAnalizer.lexStartsFrom)}. Переменная {self.curlex.lex} не была объявлена')
+            for i in reversed(self.stackTable):
+                if ident.lex in i:
+                    self.lexAnalizer.nextLex() 
+                    oplex = self.lexAnalizer.getLex()   
+                    symb_var = Symbols.SymVar(ident, i[ident.lex])
+                    return Symbols.IdentNode(symb_var)
+            self.errorshow(f'Переменная {self.curlex.lex} не была объявлена')
         elif self.curlex.type == "Integer":
             varSym = Symbols.SymInt(self.curlex, Symbols.SymType(self.curlex.type.lower()))
             self.lexAnalizer.nextLex() 
@@ -334,9 +367,6 @@ class Parser():
             varSym = Symbols.SymStr(self.curlex, Symbols.SymType(self.curlex.type.lower()))
             self.lexAnalizer.nextLex() 
             return Symbols.StringConstNode(varSym)
-
-
-        ######
         elif self.curlex.lex == "(":
             self.lexAnalizer.nextLex() 
             self.curlex = self.lexAnalizer.getLex()
@@ -346,4 +376,3 @@ class Parser():
             self.Require([")"])
             return curNode
         return Symbols.NullNode()
-    ############

@@ -10,7 +10,7 @@ begin
 ││├/
 │││├a
 ││││├integer
-│││├5
-││││├integer
+│││├5.5
+││││├float
 │││├float
 end

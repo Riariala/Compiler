@@ -1,0 +1,4 @@
+var a,n: integer;
+begin
+  for a=0 to 5 do n:=5 
+end.

@@ -1,0 +1,9 @@
+var a:integer;
+begin { основная программа }
+if a>5 then
+begin
+var i:integer;
+i+=1
+end;
+  	writeln(i)
+end.
