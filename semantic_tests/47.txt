@@ -1,0 +1,4 @@
+var a:array[1..10] of array[1..5] of integer;
+begin
+a[5,n+g] := 5;
+end.

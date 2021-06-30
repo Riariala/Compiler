@@ -5,7 +5,8 @@ function
 │││├integer
 ││├b
 │││├integer
-│├(
+│├integer
+│├)
 ├begin
 │├writeln
 │││├+

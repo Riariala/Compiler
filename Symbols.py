@@ -73,6 +73,7 @@ class SymArray(SymType):
     def __init__(self, name, diap):
         super().__init__(name)
         self.diap = diap #[[]]
+        self.typeref = SymType(name)
          
     def Print(self, fw, space):
         writeline = "│"*space + "├"
@@ -108,7 +109,8 @@ class Symfunc(Symbol):
         fw.write(writeline +'(\n')
         for i in self.args:
             i.Print(fw, space+2)
-        fw.write(writeline +'(\n')
+        self.typeref.Print(fw, space+1)
+        fw.write(writeline +')\n')
 
 class SymPointer(Symbol):
     def __init__(self, name):
@@ -195,8 +197,12 @@ class ProgVarNode(Node):
             writeline = "│"*(sp-1) + "├"
         fw.write(writeline + str(self.varanme.lex)+'\n')
         sp+=1
-        self.vartype.Print(fw,sp)
-        self.numnode.Print(fw, sp)
+        writeline = "│"*(sp-1) + "├"
+        if type(self.vartype) == str:
+            fw.write(writeline + str(self.vartype)+'\n')
+        else:
+            self.vartype.Print(fw,sp)
+        self.numnode.Print(fw, sp-1)
 
 class SingleTypeNode(Node):
     def __init__(self, lex):
@@ -481,14 +487,6 @@ class toMassNode(Expression):
             fw.write(writeline2 + i +'\n')
         fw.write(writeline1 +']\n')
         fw.write(writeline1 + self.lexref.typeref.name+'\n')
-        #if space != 0:
-        #    writeline = "│"*(space) + "├"
-        #else:
-        #    writeline = ""
-        #fw.write(writeline + self.opensk.lex + '\n')
-        #for i in self.middle:
-        #    i.Print(fw, space+2)
-        #fw.write(writeline + self.closesk.lex+'\n')
 
 class callNode(Expression):
     def __init__(self, lex, middle):

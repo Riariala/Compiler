@@ -27,6 +27,7 @@ if __name__ == '__main__':
     # запуск и тестирование синтаксического анализатора:
     lenth = len([name for name in os.listdir(directory) if os.path.isfile(directory+"\\"+name)])//2 +1
     if starttest>=lenth or starttest<=0: starttest =1
+    correctd = int(lenth)
     for i in range(starttest,lenth):
         testname = directory+"\\"+str(i)+".txt"
         answname = directory+"\\code_answ\\"+str(i)+".txt"
@@ -58,7 +59,7 @@ if __name__ == '__main__':
             itog = parserper.parseProgramm()
             itog.Print(fw, 0)
         fw.close()
-
+        #uncorrect = 0
         #Вывод итога теста:
         with open(answname, "r", encoding="utf-8") as thisf, open(chackname, "r", encoding="utf-8") as correct:
             while True:
@@ -68,8 +69,11 @@ if __name__ == '__main__':
                     print(False)
                     print("ошбика в выражении "+ str(cr))
                     print(cr + ar)
+                    correctd -=  1
                     break
                 if ar == "":
                     print(True)
                     break
+
+    print(f'верных ответов {str(correctd)}/{str(lenth)}')
 

@@ -14,20 +14,20 @@ class Parser():
     def Require(self, name):
         if self.lexAnalizer.getLex().lex not in name:
             waited = "' или '".join(name)
-            raise  Exception(f'Строка  {str(self.lexAnalizer.lexStartsFromLine)}, символ {str(self.lexAnalizer.lexStartsFrom)}. Встречено "{self.lexAnalizer.getLex().lex}", ожидалось "{waited}"')
+            raise  Exception(f'Строка  {str(self.curlex.line)}, символ {str(self.curlex.charn)}. Встречено "{self.lexAnalizer.getLex().lex}", ожидалось "{waited}"')
         self.lexAnalizer.nextLex()
 
     def RequireType(self, typename):
         if self.lexAnalizer.getLex().type not in typename:
             waited = "' или '".join(typename)
-            raise  Exception(f'Строка  {str(self.lexAnalizer.lexStartsFromLine)}, символ {str(self.lexAnalizer.lexStartsFrom)}. Встречено "{self.lexAnalizer.getLex().lex}", ожидалось "{waited}"')
+            raise  Exception(f'Строка  {str(self.curlex.line)}, символ {str(self.curlex.charn)}. Встречено "{self.lexAnalizer.getLex().lex}", ожидалось "{waited}"')
 
     def checkNodeType(self, Nodetypes, nodetocheck):
         if type(nodetocheck) in Nodetypes:
-            raise Exception(f'Строка  {str(self.lexAnalizer.lexStartsFromLine)}, символ {str(self.lexAnalizer.lexStartsFrom)}. Встречено "{self.lexAnalizer.getLex().lex}", ожидалось выражение')
+            raise Exception(f'Строка  {str(self.curlex.line)}, символ {str(self.curlex.charn)}. Встречено "{self.lexAnalizer.getLex().lex}", ожидалось выражение')
 
     def errorshow(self, massage):
-        raise Exception(f'Строка  {str(self.lexAnalizer.lexStartsFromLine)}, символ {str(self.lexAnalizer.lexStartsFrom)}. {massage}')
+        raise Exception(f'Строка  {str(self.curlex.line)}, символ {str(self.curlex.charn)}. {massage}')
 
     def parseProgramm(self):
         try:
@@ -153,7 +153,6 @@ class Parser():
         elif oprtn.name == ':=':
             exprnode = self.parseExpression()
             vartype = exprnode.lexref.typeref.name
-        
         varnodeslist = []
         for i in varnames:
             self.stackTable[-1][i.lex] = vartype
@@ -317,7 +316,7 @@ class Parser():
             if condit1.lexref.lexref.typeref.name!="integer":
                 self.errorshow(f'Ожидался тип integer')
         except:
-            if condit1.stmts[0].vartype.name!="integer":
+            if condit1.stmts[0].vartype!="integer":
                 self.errorshow(f'Ожидался тип integer')
                 ProgVarBlockNode
         toW = self.lexAnalizer.getLex()
@@ -454,22 +453,29 @@ class Parser():
             oplex = self.lexAnalizer.getLex()  
             if oplex.type == "Delimiter" and oplex.lex == "[":
                 mid =[]
+                middle = []
                 while oplex.lex in [',','[']:
                     self.lexAnalizer.nextLex() 
-                    mid.append(self.parseExpression().lexref.name.lex)
+                    mid.append(self.parseExpression())
                     oplex = self.lexAnalizer.getLex() 
                 if len(mid) != len(tableElem.diap):
                     self.errorshow(f'Неверное количество индексов, ожидалось {len(tableElem.diap)}')
                 for i in range(len(mid)):
+                    mint = ''
                     try:
-                        mint = int(mid[i])
+                        mint = int(mid[i].lexref.name.lex)
                     except:
                         pass
-                    if mint <= tableElem.diap[i][0] or mint >= tableElem.diap[i][1]:
-                        self.errorshow(f'Индекс за пределами диапазона')
+                    if mint:
+                        if mint <= tableElem.diap[i][0] or mint >= tableElem.diap[i][1]:
+                            self.errorshow(f'Индекс за пределами диапазона')
+                    else:
+                        if mid[i].lexref.typeref.name != 'integer':
+                            self.errorshow(f'Тип должен быть integer')
+                    middle.append(mid[i].lexref.name.lex)
                 self.curlex = self.lexAnalizer.getLex()
                 self.Require(["]"])
-                return Symbols.toMassNode(symb_var, mid)
+                return Symbols.toMassNode(symb_var, middle)
 
             if oplex.type == "Delimiter" and oplex.lex == "(":
                 main = self.curlex

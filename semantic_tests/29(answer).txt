@@ -9,8 +9,8 @@ begin
 ││├:=
 │││├i
 ││││├integer
-││││├2
-│││││├integer
+│││├2
+││││├integer
 ├to
 │├n
 ││├integer

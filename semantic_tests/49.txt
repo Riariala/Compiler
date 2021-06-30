@@ -1,0 +1,5 @@
+var a:array[1..10] of array[1..5] of integer;
+n:float;
+begin
+a[5,n] := 5;
+end.
