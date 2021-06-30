@@ -382,9 +382,7 @@ class Parser():
                     while self.curlex.lex != ")":
                         mid.append(self.parseExpression())
                         self.curlex = self.lexAnalizer.getLex()
-                        err = self.Require([")", ","])
-                        if err:
-                            return Node.ErrorNode(err)
+                        self.Require([")", ","])
                 return Node.callNode(main, mid, open, self.curlex)
             return Node.IdentNode(self.curlex)
         elif self.curlex.type == "Integer" or self.curlex.type == "Float":  

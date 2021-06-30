@@ -1,0 +1,9 @@
+procedure DoAdd(a,b: float);
+begin
+  a:= a + b;
+end;
+
+var a: integer;
+begin
+	a:=DoAdd(1,2)
+end.

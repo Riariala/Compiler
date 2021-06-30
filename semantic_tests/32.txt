@@ -1,0 +1,8 @@
+function DoAdd (a,b: integer):integer;
+begin
+  writeln(a + b);
+end;
+begin
+var b: string;
+b:='f'
+end.

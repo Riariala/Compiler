@@ -70,21 +70,56 @@ class SymStr(SymType):
         self.typeref.Print(fw, space+1)
 
 class SymArray(SymType):
-    def __init__(self, name):
+    def __init__(self, name, diap):
         super().__init__(name)
-
+        self.diap = diap #[[]]
+         
+    def Print(self, fw, space):
+        writeline = "│"*space + "├"
+        writeline2 = "│"*(space+1) + "├"
+        for i in self.diap:
+            fw.write(writeline  + '[\n')
+            fw.write(writeline2 + str(i[0]) + '\n')
+            fw.write(writeline2 + str(i[1]) + '\n')
+            fw.write(writeline  + ']\n')
+        if space != 0:
+            writeline = "│"*(space-1) + "├"
+        else:
+            writeline = ""
+        fw.write(writeline + self.name + '\n')
 
 class SymStruct(Symbol):
     def __init__(self, name):
         super().__init__(name)
 
 class Symfunc(Symbol):
-    def __init__(self, name):
+    def __init__(self, name, typeref, args):
         super().__init__(name)
+        self.typeref = typeref
+        self.args = args
+
+    def Print(self, fw, space):
+        if space != 0:
+            writeline = "│"*(space-1) + "├"
+        else:
+            writeline = ""
+        fw.write(writeline + self.name + '\n')
+        writeline = "│"*(space) + "├"
+        fw.write(writeline +'(\n')
+        for i in self.args:
+            i.Print(fw, space+2)
+        fw.write(writeline +'(\n')
 
 class SymPointer(Symbol):
     def __init__(self, name):
         super().__init__(name)
+
+class SymVoid(Symbol):
+    def __init__(self, name):
+        super().__init__(name)
+
+    def Print(self, fw, space):
+        pass
 
 class SymExpr(Symbol):
     def __init__(self, name, left, right, typeref):
@@ -218,13 +253,6 @@ class DiapnNode(Node):
         self.right.Print( fw, space+1)
         self.left.Print( fw, space+1)
 
-class FrrayInitNode(Node):
-    def __init__(self, varanme, _type, numnode, oprtn):
-        self.varanme = varanme
-        self.vartype = _type
-        self.numnode = numnode
-        self.oprtn = oprtn
-
 class StmtNode(Node):
     def __init__(self, stmt):
         self.stmt = stmt
@@ -247,48 +275,32 @@ class BlockNode(Node):
         fw.write(writeline + 'end\n')
 
 class FuncNode(Node):
-    def __init__(self, callW, funcName, rbrac, lbrac, dotdot,resulttype, body, args):
-        self.callW = callW
-        self.funcName = funcName
-        self.rbrac = rbrac
-        self.lbrac = lbrac
-        self.dotdot = dotdot
-        self.resulttype = resulttype
+    def __init__(self, resulttype, body):
+        self.lexref = resulttype
         self.body = body
-        self.args = args
 
     def Print(self, fw, space):
-        self.callW.Print(fw, space)
-        writeline1 = "│"*space + "├"
-        fw.write(writeline1 + str(self.funcName.lex)+'\n')
-        writeline2 = "│"*(space+1) + "├"
-        fw.write(writeline2 + str(self.rbrac.lex)+'\n')
-        for i in self.args:
-            i.Print(fw, space+3)
-        fw.write(writeline2 + str(self.lbrac.lex)+'\n')
-        fw.write(writeline1 + str(self.dotdot.lex)+'\n')
-        fw.write(writeline2 + str(self.resulttype.lex)+'\n')
+        if space != 0:
+            writeline = "│"*(space-1) + "├"
+        else:
+            writeline = ""
+        fw.write(writeline + 'function\n')
+        self.lexref.Print(fw, space+1)
         self.body.Print(fw, space+1)
 
 
 class ProcedureNode(Node):
-    def __init__(self, callW, funcName, rbrac, lbrac, body, args):
-        self.callW = callW
-        self.funcName = funcName
-        self.rbrac = rbrac
-        self.lbrac = lbrac
+    def __init__(self, resulttype, body):
+        self.lexref = resulttype
         self.body = body
-        self.args = args
 
     def Print(self, fw, space):
-        self.callW.Print(fw, space)
-        writeline1 = "│"*space + "├"
-        fw.write(writeline1 + str(self.funcName.lex)+'\n')
-        writeline2 = "│"*(space+1) + "├"
-        fw.write(writeline2 + str(self.rbrac.lex)+'\n')
-        for i in self.args:
-            i.Print(fw, space+3)
-        fw.write(writeline2 + str(self.lbrac.lex)+'\n')
+        if space != 0:
+            writeline = "│"*(space-1) + "├"
+        else:
+            writeline = ""
+        fw.write(writeline + 'procedure\n')
+        self.lexref.Print(fw, space+1)
         self.body.Print(fw, space+1)
 
 class FuncProcRefArg(Node):
@@ -452,34 +464,35 @@ class RecordNode(Expression):
         self.right.Print(fw, space+1)
 
 class toMassNode(Expression):
-    def __init__(self, lex, middle, opensk, closesk):
-        self.mainname = lex.lex
-        self.opensk = opensk
-        self.closesk = closesk
-        self.lex = lex
-        self.middle = middle
+    def __init__(self, lex, middle):
+        self.lexref = lex
+        self.position = middle #[]
 
     def Print(self, fw, space):
         if space != 0:
             writeline = "│"*(space-1) + "├"
         else:
             writeline = ""
-        fw.write(writeline + self.mainname+'\n')
-        if space != 0:
-            writeline = "│"*(space) + "├"
-        else:
-            writeline = ""
-        fw.write(writeline + self.opensk.lex + '\n')
-        for i in self.middle:
-            i.Print(fw, space+2)
-        fw.write(writeline + self.closesk.lex+'\n')
+        fw.write(writeline + self.lexref.name.lex+'\n')
+        writeline1 = "│"*space + "├"
+        fw.write(writeline1 +'[\n')
+        writeline2 = "│"*(space+1) + "├"
+        for i in self.position:
+            fw.write(writeline2 + i +'\n')
+        fw.write(writeline1 +']\n')
+        fw.write(writeline1 + self.lexref.typeref.name+'\n')
+        #if space != 0:
+        #    writeline = "│"*(space) + "├"
+        #else:
+        #    writeline = ""
+        #fw.write(writeline + self.opensk.lex + '\n')
+        #for i in self.middle:
+        #    i.Print(fw, space+2)
+        #fw.write(writeline + self.closesk.lex+'\n')
 
 class callNode(Expression):
-    def __init__(self, lex, middle, opensk, closesk):
-        self.mainname = lex.lex
-        self.opensk = opensk
-        self.closesk = closesk
-        self.lex = lex
+    def __init__(self, lex, middle):
+        self.lexref = lex
         self.middle = middle
 
     def Print(self, fw, space):
@@ -487,16 +500,17 @@ class callNode(Expression):
             writeline = "│"*(space-1) + "├"
         else:
             writeline = ""
-        fw.write(writeline+ self.mainname + '\n')
+        fw.write(writeline + self.lexref.name+'\n')
         writeline = "│"*(space) + "├"
-        fw.write(writeline + self.opensk.lex +'\n')
+        fw.write(writeline+  '(\n')
         for i in self.middle:
             i.Print(fw, space+2)
-        fw.write(writeline + self.closesk.lex + '\n')
+        fw.write(writeline + ')\n')
 
 class NullNode(Node):
     def __init__(self):
         self.name = ""
+        lexref = SymVoid('')
 
     def Print(self, fw, space):
         pass

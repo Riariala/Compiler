@@ -1,0 +1,7 @@
+function DoAdd (a,b: integer):integer;
+begin
+end;
+begin
+var b: integer;
+b:=DoAdd (1,2)
+end.
